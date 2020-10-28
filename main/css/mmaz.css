@@ -1,0 +1,142 @@
+
+
+@import 'https://fonts.googleapis.com/css?family=Open+Sans';
+
+h1 {
+	font-family: Open Sans;
+	font-size: 24px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: bold;
+	line-height: 26.4px;
+}
+h2 {
+	font-family: Open Sans;
+	font-size: 20px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: bold;
+	line-height: 20.4px;
+}
+h3 {
+	font-family: Open Sans;
+	font-size: 14px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: bold;
+	line-height: 15.4px;
+}
+p {
+	min-width: 200px;
+	max-width: 800px;
+	font-family: Open Sans;
+	font-size: 14px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+
+ul {
+	font-family: Open Sans;
+	font-size: 14px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 20px;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+blockquote {
+	font-family: Open Sans;
+	font-size: 21px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 30px;
+}
+pre {
+	font-family: Open Sans;
+	font-size: 13px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 18.5667px;
+}
+
+
+div.container {
+    width: 100%;
+    border: 1px solid gray;
+}
+
+
+
+top {
+    width: 100%;
+}
+
+banner {
+    height: 105px;
+    max-width: 160px; 
+    color: white;
+    
+
+}
+
+header {
+    padding: 1em;
+    height: 105px;
+    margin-left: 170px;
+    border-bottom: 3px solid #00a9e0;
+background: #ffffff; /* Old browsers */
+background: -moz-linear-gradient(left, #ffffff 0%, #00a9e0 50%, #00a9e0 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left, #ffffff 0%,#00a9e0 50%,#00a9e0 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right, #ffffff 0%,#00a9e0 50%,#00a9e0 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00a9e0',GradientType=1 ); /* IE6-9 */
+    color: #FFFFFF;
+    text-align: right;
+ 
+}
+
+
+
+nav {
+    float: left;
+    max-width: 160px;
+    margin: 0;
+    padding: 1em;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    
+}
+
+
+
+nav ul a {
+    text-decoration: none;
+    color:  gray; 
+   
+	       
+    
+}
+
+article {
+   
+    margin-left: 170px;
+    border-left: 3px solid #00a9e0;
+    padding: 1em;
+    overflow: hidden;
+}
+
+
+img {
+    border-color : #00a9e0;
+      }
+

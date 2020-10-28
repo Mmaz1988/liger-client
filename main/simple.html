@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="css/mmaz.css">
+    <link rel="stylesheet" href="css/opensans.css">
+    <script src= src="https://code.jquery.com/jquery-3.5.1.js"
+            integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.16.2/cytoscape.min.js"></script>
+    <script src="https://unpkg.com/popper.js@1.14.7/dist/umd/popper.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-popper@1.0.4/cytoscape-popper.min.js"></script>
+    <script src="https://unpkg.com/tippy.js@4.0.1/umd/index.all.min.js"></script>
+</head>
+<style>
+    #cy {
+        width: 800px;
+        height: 600px;
+        display: block;
+        border-style: solid;
+        border-radius: 25px;
+        border-color: #00a9e0;
+    }
+</style>
+<top>
+<banner>
+    <a href="http://www.uni-konstanz.de/" target="_blank">
+        <img style="border: 0;" src="images/logo.svg" alt="unilogo" width="160" height="135"
+             title="Uni Konstanz" align="left">
+    </a>
+</banner>
+<header>
+    <h1>Testpage of the Abstract Syntax Annotator </h1>
+    <h2>
+        Written by Mark-Matthias Zymla <br>
+    </h2>
+</header>
+</top>
+<container>
+
+    <nav>
+
+        <ul>
+            <li><a href="#abstract_syntax_annotator"> Introduction </a> </li>
+            <li><a href="#simple_demo"> Demo description </a> </li>
+            <li><a href="#demo_form"> The demo </a> </li>
+        </ul>
+<!--
+        <ul>
+            <li><a href= "index.html"> Home </a> </li>
+            <li><a href= "projects.html"> Projects </a> </li>
+            <li><a href= "publications.html"> Research </a> </li>
+            <li><a href= "teachings.html"> Teachings </a> </li>
+        </ul>
+-->
+    </nav>
+
+    <article>
+
+        <h1 id="abstract_syntax_annotator">
+            The Abstract Syntax Annotator
+        </h1>
+
+        <p>
+            In line with much recent research on semantic annotation, the abstract syntax annotator is designed to
+            add annotations to syntactic analyses of natural language expressions. In particular, the system focuses
+            on analyses provided by two syntactic frameworks, namely, LFG (as implemented in the Xerox Lingustics
+            Environment (XLE)), and Universal Dependencies (as implemented in the Stanford CoreNLP library).
+            </p>
+            <p>
+            The system translates (parts) of LFG and UD representations into more abstract linguistic annotation graphs
+            and allows the user to apply transfer rules (an expression coined by the XLE transfer system) to rewrite
+            and expand on linguistic annotations. The system is inspired by the previously mentioned transfer component
+                of the XLE, the packed rewrite system, which is, unfortunately not supported by XLE anymore.
+                The abstract syntactic annotator aims at picking up this legacy and  provides a framework independent
+                rule system for expansion or rewriting of linguistic annotations.
+            </p>
+        <p>
+            In addition to adding linguistic annotations (i.e., relational information and linguistic feature information)
+            the system is also coupled with the Glue Semantics Workbench (GSWB), a glue semantics prover written in Java.
+            To make use of the GSWB, the system also allows users to write rules that directly produce glue semantics
+            representations based on a description-by-analysis framework.
+        </p>
+        <p>
+            This page provides a simple demo of the system with a visualization component to better explain the capabilities
+            of the system.
+        </p>
+
+        <h2 id="simple_demo">
+            Simple Demo:
+        </h2>
+
+        <p>The simple demo adds abstract tense and aspect information to a universal dependency graph. More concretely,
+        it aggregates syntactic features into semantically interpretable features. It abstracts away from complex syntactic structures
+        to a simple attribute/value matrix for tense and aspect. For this purpose it uses the rules listed in
+        <a href="test_files/testRulesUD4.txt" target="_blank">TAM-conversion rules</a>. The final result of this conversion is given
+        in the TAM node. These test rules follow, to some extent, the best practices of encoding tense and aspect in XLE
+        in accordance with the <a href="https://pargram.w.uib.no/" target="_blank">ParGram project</a>, providing
+        a flat analysis of complex auxiliary constructions (e.g. English perfect, and progressive).</p>
+
+<form action="#" onsubmit="return false;" id="demo_form">
+    <label for="s1">Input sentence:</label><br>
+    <input type="text" id="s1" name="sentence" value="John loves Mary"><br>
+    <input type="submit" value="Submit" onclick="process_sentence(this)">
+</form>
+
+<h2 id="graph_window">
+    Graph should appear below here:
+</h2>
+        <div id = 'cy'></div>
+
+
+<script>
+    //Address of the controller on server side
+    var page = "http://localhost:8080/annotate"
+    var input = "";
+
+    //To add tool tips to elements (used to add avps to graphs)
+    function makePopper(ele) {
+        let ref = ele.popperRef(); // used only for positioning
+
+        ele.tippy = tippy(ref, { // tippy options:
+            content: () => {
+                let content = document.createElement('div');
+
+                var attributes = ele._private.data;
+                console.log(attributes);
+
+                if (attributes.hasOwnProperty("avp")) {
+                    for (var key in attributes.avp) {
+                        content.innerHTML = content.innerHTML + key + " : " + attributes.avp[key] + "<br>";
+                    }
+                }
+
+                //content.innerHTML = ele.id();
+
+                return content;
+            },
+            trigger: 'manual' // probably want manual mode
+        });
+    }
+
+    //Reads in sentence and formats it for a request to server
+    function process_sentence(form)
+    {
+        var sentence = document.getElementById("s1").value;
+        document.getElementById("graph_window").innerHTML = 'Now displaying graph for "' + sentence + '"';
+        console.log("Read in sentence:" + sentence)
+
+        var params = { in: sentence}
+        console.log("Generated parameter: " + params);
+
+        var url = page + formatParams(params);
+        console.log("Make get request to: "+ url);
+        callREST(url, function (data) {
+            //Callback
+        console.log(data);
+        });
+    }
+
+    //Makes a request to server to process input sentence. server returns a graph in json form
+    //The graph is embedded in a cytoscape graph visualization and displayed on the page.
+    function callREST(url,callback) {
+
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            type: 'post',
+            success: function( data ) {
+                //alert( "SUCCESS:  " + data);
+                input = data;
+                console.log(data);
+                console.log(input.nodes);
+
+                var cy = window.cy = cytoscape({
+
+                    container: document.getElementById('cy'), // container to render in
+
+                    elements: input.nodes,
+                    style: [ // the stylesheet for the graph
+                        {
+                            selector: 'node[type="input"]',
+                            css: {
+                                "content": "data(id)",
+                                "color": "blue",
+                                "text-valign": "center",
+                                "text-halign": "center",
+                                "height": "60px",
+                                "width": "60px",
+                                "background-fill": "linear-gradient",
+                                "background-gradient-stop-colors": "#00FFFF white", // get data from data.color in each node
+                                "background-gradient-stop-positions": "0 30 60"
+                            }
+                        },
+                        {
+                            selector: 'node[type="annotation"]',
+                            css: {
+                                "content": "data(id)",
+                                "color": "blue",
+                                "text-valign": "center",
+                                "text-halign": "center",
+                                "height": "60px",
+                                "width": "60px",
+                                "background-fill": "linear-gradient",
+                                "background-gradient-stop-colors": "red white", // get data from data.color in each node
+                                "background-gradient-stop-positions": "0 30 60"
+                            }
+                        },
+                        {
+                            selector: 'edge[type="edge"]',
+                            style: {
+                                'width': 3,
+                                'line-color': '#ccc',
+                                'target-arrow-color': '#ccc',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier',
+
+                            }
+                        },
+                        {
+                            selector: 'edge[type="proj"]',
+                            style: {
+                                'width': 3,
+                                'line-color': '#ccc',
+                                'line-style': 'dashed',
+                                'target-arrow-color': '#ccc',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier',
+
+                            }
+                        },
+                        {
+                            selector: "edge[label]",
+                            css: {
+                                "label": "data(label)",
+                                "text-rotation": "autorotate",
+                                "text-margin-x": "0px",
+                                "text-margin-y": "-15px"
+                            }
+                        }
+                    ],
+
+                    layout: {
+                        name: 'breadthfirst'
+                        //  rows: 1
+                    }
+
+                });
+
+                /*
+                cy.on('tap', 'node', function(evt){
+                    var node = evt.target
+                    console.log( 'tapped ' + node.id() );
+                });
+
+                cy.on('mouseover', 'node', function(event) {
+                    var node = event.target;
+                    let popper1 = node.popper({
+                        content: () => {
+                            let div = document.createElement('div');
+
+                            div.innerHTML = 'Popper content';
+
+                            document.body.appendChild(div);
+
+                            return div;
+                        },
+                        popper: {}
+                    });
+
+                });
+                */
+
+
+                //Add tooltips to graph on mouseover
+                cy.ready(function() {
+                    cy.elements().forEach(function(ele) {
+                        console.log(ele);
+                        console.log(ele._private.data);
+                        if (ele._private.data.hasOwnProperty("avp")) {
+                            makePopper(ele);
+                        }
+                    });
+                });
+
+                cy.elements().unbind('mouseover');
+                cy.elements().bind('mouseover', (event) => event.target.tippy.show());
+
+                cy.elements().unbind('mouseout');
+                cy.elements().bind('mouseout', (event) => event.target.tippy.hide());
+
+
+            },
+            error: function( data ) {
+                alert( "ERROR:  " + data);
+                console.log(data);
+            }
+        });
+
+  //      console.log("Read in: " + input);
+   //     console.log("From: " + url);
+    }
+
+
+ //Formats input json into a string that can be appended to a server request as parameter
+    function formatParams( params ){
+        return "?" + Object
+            .keys(params)
+            .map(function(key){
+                return key+"="+encodeURIComponent(params[key])
+            })
+            .join("&")
+    }
+
+//Container for displaying the graph produced by callREST()
+</script>
+    </article>
+</container>
+</html>
+<!--
+    //  var sentence = prompt("Enter a sentence");
+    /*
+        var params =  {
+            in: sentence
+        }
+
+        const url =  page + formatParams(params)
+        console.log(url);
+    */
+
+    /*
+      $.getJSON(url, { get_param: 'value' }, function(data) {
+          $.each(data, function(index, element) {
+              $('body').append($('<div>', {
+                  text: element.in
+              }));
+          });
+      });
+  */
+
+    /*
+    fetch(url)
+    .then(res => res.json())
+    .then((out) => {
+        console.log("Output: ", out);
+    }).catch(err => console.error(err));
+*/
+
+
+    // const xhr = new XMLHttpRequest();
+
+    /*
+       xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE)
+        {
+         alert(xhr.response);
+        } else
+        {
+            alert(xhr.response);
+            console.log("Failed ready state" + xhr.readyState);
+            alert("Request failed");
+        }
+        }
+
+    */
+    /*
+    xhr.responseType = 'json';
+    xhr.open("GET",url,true);
+    xhr.onload = function() {
+        var jsonResponse = xhr.response;
+        console.log("This is the content of the file:" + jsonResponse.content);
+    };
+    xhr.send(null);
+*/
+
+
+
+
+
+    /*
+    xhr.onload = function() {
+        var status = xhr.status;
+
+        if (status === 200) {
+            alert(xhr.response);
+        }else{
+            alert(status);
+        }
+    };
+     */
+    //   xhr.send();
+
+    //  document.write(http.responseText)
+
+
+    /*
+    $.getJSON("cyto.js", function (data) {
+        console.log(data);
+        console.log("This is a test.");
+        var cy = window.cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements: data,
+            style: [ // the stylesheet for the graph
+                {
+                    selector: 'node[type="syntax"]',
+                    css: {
+                        "content": "data(id)",
+                        "color": "blue",
+                        "text-valign": "center",
+                        "text-halign": "center",
+                        "height": "60px",
+                        "width": "60px",
+                        "background-fill": "linear-gradient",
+                        "background-gradient-stop-colors": "#00FFFF white", // get data from data.color in each node
+                        "background-gradient-stop-positions": "0 30 60"
+                    }
+                },
+                {
+                    selector: 'node[type="semantics"]',
+                    css: {
+                        "content": "data(id)",
+                        "color": "blue",
+                        "text-valign": "center",
+                        "text-halign": "center",
+                        "height": "60px",
+                        "width": "60px",
+                        "background-fill": "linear-gradient",
+                        "background-gradient-stop-colors": "red white", // get data from data.color in each node
+                        "background-gradient-stop-positions": "0 30 60"
+                    }
+                },
+                {
+                    selector: 'edge[type="edge"]',
+                    style: {
+                        'width': 3,
+                        'line-color': '#ccc',
+                        'target-arrow-color': '#ccc',
+                        'target-arrow-shape': 'triangle',
+                        'curve-style': 'bezier',
+
+                    }
+                },
+                {
+                    selector: 'edge[type="proj"]',
+                    style: {
+                        'width': 3,
+                        'line-color': '#ccc',
+                        'line-style': 'dashed',
+                        'target-arrow-color': '#ccc',
+                        'target-arrow-shape': 'triangle',
+                        'curve-style': 'bezier',
+
+                    }
+                },
+                {
+                    selector: "edge[label]",
+                    css: {
+                        "label": "data(label)",
+                        "text-rotation": "autorotate",
+                        "text-margin-x": "0px",
+                        "text-margin-y": "-15px"
+                    }
+                }
+            ],
+
+            layout: {
+                name: 'breadthfirst'
+                //  rows: 1
+            }
+        });
+    });
+*/
+    /*
+        var cy = window.cy = cytoscape({
+
+            container: document.getElementById('cy'), // container to render in
+
+            elements: input,
+            style: [ // the stylesheet for the graph
+                {
+                    selector: 'node[type="syntax"]',
+                    css: {
+                        "content": "data(id)",
+                        "color": "blue",
+                        "text-valign": "center",
+                        "text-halign": "center",
+                        "height": "60px",
+                        "width": "60px",
+                        "background-fill": "linear-gradient",
+                        "background-gradient-stop-colors": "#00FFFF white", // get data from data.color in each node
+                        "background-gradient-stop-positions": "0 30 60"
+                    }
+                },
+                {
+                    selector: 'node[type="semantics"]',
+                    css: {
+                        "content": "data(id)",
+                        "color": "blue",
+                        "text-valign": "center",
+                        "text-halign": "center",
+                        "height": "60px",
+                        "width": "60px",
+                        "background-fill": "linear-gradient",
+                        "background-gradient-stop-colors": "red white", // get data from data.color in each node
+                        "background-gradient-stop-positions": "0 30 60"
+                    }
+                },
+                {
+                    selector: 'edge[type="edge"]',
+                    style: {
+                        'width': 3,
+                        'line-color': '#ccc',
+                        'target-arrow-color': '#ccc',
+                        'target-arrow-shape': 'triangle',
+                        'curve-style': 'bezier',
+
+                    }
+                },
+                {
+                    selector: 'edge[type="proj"]',
+                    style: {
+                        'width': 3,
+                        'line-color': '#ccc',
+                        'line-style': 'dashed',
+                        'target-arrow-color': '#ccc',
+                        'target-arrow-shape': 'triangle',
+                        'curve-style': 'bezier',
+
+                    }
+                },
+                {
+                    selector: "edge[label]",
+                    css: {
+                        "label": "data(label)",
+                        "text-rotation": "autorotate",
+                        "text-margin-x": "0px",
+                        "text-margin-y": "-15px"
+                    }
+                }
+            ],
+
+            layout: {
+                name: 'breadthfirst'
+                //  rows: 1
+            }
+
+        });
+    */
+
+    /*
+    var cy = window.cy = cytoscape({
+
+        container: document.getElementById('cy'), // container to render in
+
+        elements: [ // list of graph elements to start with
+            { // node a
+                data: {id: '1',type: "syntax"}
+            },
+            { // node b
+                data: {id: '2',type: "syntax"}
+            },
+            {
+                data: {id: '3',type: "syntax"}
+            },
+            { // edge ab
+                data: {id: '12', source: '1', target: '2', label: "TENSE",type: "edge" }
+            },
+            { // edge ab
+                data: {id: '13', source: '1', target: '3', label: "ASPECT",type: "edge"}
+            },
+            { // node a
+                data: {id: '4',type: "semantics"}
+            },
+            { // node b
+                data: {id: '5',type: "semantics"}
+            },
+            {
+                data: {id: '6',type: "semantics"}
+            },
+            { // edge ab
+                data: {id: '45', source: '4', target: '5', label: "TENSE",type: "edge"}
+            },
+            { // edge ab
+                data: {id: '46', source: '4', target: '6', label: "ASPECT",type: "edge"}
+            },
+            { // edge ab
+                data: {id: '14', source: '1', target: '4', label: "projection",type: "proj"}
+            }
+        ]
+        ,
+
+        style: [ // the stylesheet for the graph
+            {
+                selector: 'node[type="syntax"]',
+                css: {
+                    "content": "data(id)",
+                    "color": "blue",
+                    "text-valign": "center",
+                    "text-halign": "center",
+                    "height": "60px",
+                    "width": "60px",
+                    "background-fill": "linear-gradient",
+                    "background-gradient-stop-colors": "#00FFFF white", // get data from data.color in each node
+                    "background-gradient-stop-positions": "0 30 60"
+                }
+            },
+            {
+                selector: 'node[type="semantics"]',
+                    css: {
+                        "content": "data(id)",
+                        "color": "blue",
+                        "text-valign": "center",
+                        "text-halign": "center",
+                        "height": "60px",
+                        "width": "60px",
+                        "background-fill": "linear-gradient",
+                        "background-gradient-stop-colors": "red white", // get data from data.color in each node
+                        "background-gradient-stop-positions": "0 30 60"
+                    }
+            },
+            {
+                selector: 'edge[type="edge"]',
+                style: {
+                    'width': 3,
+                    'line-color': '#ccc',
+                    'target-arrow-color': '#ccc',
+                    'target-arrow-shape': 'triangle',
+                    'curve-style': 'bezier',
+
+                }
+            },
+            {
+                selector: 'edge[type="proj"]',
+                style: {
+                    'width': 3,
+                    'line-color': '#ccc',
+                    'line-style': 'dashed',
+                    'target-arrow-color': '#ccc',
+                    'target-arrow-shape': 'triangle',
+                    'curve-style': 'bezier',
+
+                }
+            },
+            {
+                selector: "edge[label]",
+                css: {
+                    "label": "data(label)",
+                    "text-rotation": "autorotate",
+                    "text-margin-x": "0px",
+                    "text-margin-y": "-15px"
+                }
+            }
+        ],
+
+        layout: {
+            name: 'breadthfirst'
+         //  rows: 1
+        }
+
+    });
+
+
+     */
+-->
