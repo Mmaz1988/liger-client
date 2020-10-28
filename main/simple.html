@@ -13,16 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-popper@1.0.4/cytoscape-popper.min.js"></script>
     <script src="https://unpkg.com/tippy.js@4.0.1/umd/index.all.min.js"></script>
 </head>
-<style>
-    #cy {
-        width: 800px;
-        height: 600px;
-        display: block;
-        border-style: solid;
-        border-radius: 25px;
-        border-color: #00a9e0;
-    }
-</style>
+
 <top>
 <banner>
     <a href="http://www.uni-konstanz.de/" target="_blank">
@@ -45,6 +36,7 @@
             <li><a href="#abstract_syntax_annotator"> Introduction </a> </li>
             <li><a href="#simple_demo"> Demo description </a> </li>
             <li><a href="#demo_form"> The demo </a> </li>
+            <li><a href="#semantics_demo">Glue semantics</a> </li>
         </ul>
 <!--
         <ul>
@@ -102,18 +94,46 @@
 <form action="#" onsubmit="return false;" id="demo_form">
     <label for="s1">Input sentence:</label><br>
     <input type="text" id="s1" name="sentence" value="John loves Mary"><br>
-    <input type="submit" value="Submit" onclick="process_sentence(this)">
+    <input type="submit" value="Submit" onclick="process_sentence('s1','cy')">
 </form>
 
-<h2 id="graph_window">
+<h3 id="graph_window">
     Graph should appear below here:
+</h3>
+        <cy id = 'cy'></cy>
+
+
+<h2 id="semantics_demo">
+    Glue semantics integration demo
 </h2>
-        <div id = 'cy'></div>
+
+ <p>
+     In addition to adding relational and attribute/value information, the abstract syntax annotator also allows users
+     to design rules that produce semantic representations. More concretely, the system allows users to add meaning
+     constructors, semantic representations used in Glue semantics. Rules for semantic interpretation initialize a set
+     of nodes the indices of which serve the generation of linear logic formulas.
+ </p>
+        <p>
+            The system uses the rules in
+            <a href="test_files/testRulesUD1.txt" target="_blank">semantic interpretation rules</a> to produce meaning
+            constructors. These rules make use of the fact, that variables on the left hand side can be instantiated to
+            concrete values on the right side of a rule (If multiple instantiations are possible, all instantiations are
+            produced, but are mapped to different readings of the sentence).
+        </p>
+
+        <form action="#" onsubmit="return false;" id="demo_form2">
+            <label for="s1">Input sentence:</label><br>
+            <input type="text" id="s2" name="sentence" value="Peter loves Mary"><br>
+            <input type="submit" value="Submit" onclick="process_sentence('s2','cy2')">
+        </form>
+
+        <cy id='cy2'></cy>
+
 
 
 <script>
     //Address of the controller on server side
-    var page = "http://localhost:8080/annotate"
+    var page = "http://localhost:8080/graph-test"
     var input = "";
 
     //To add tool tips to elements (used to add avps to graphs)
@@ -142,9 +162,9 @@
     }
 
     //Reads in sentence and formats it for a request to server
-    function process_sentence(form)
+    function process_sentence(input_id,container)
     {
-        var sentence = document.getElementById("s1").value;
+        var sentence = document.getElementById(input_id).value;
         document.getElementById("graph_window").innerHTML = 'Now displaying graph for "' + sentence + '"';
         console.log("Read in sentence:" + sentence)
 
@@ -153,7 +173,7 @@
 
         var url = page + formatParams(params);
         console.log("Make get request to: "+ url);
-        callREST(url, function (data) {
+        createGraph(url, container, function (data) {
             //Callback
         console.log(data);
         });
@@ -161,7 +181,7 @@
 
     //Makes a request to server to process input sentence. server returns a graph in json form
     //The graph is embedded in a cytoscape graph visualization and displayed on the page.
-    function callREST(url,callback) {
+    function createGraph(url,container,callback) {
 
         $.ajax({
             url: url,
@@ -173,9 +193,9 @@
                 console.log(data);
                 console.log(input.nodes);
 
-                var cy = window.cy = cytoscape({
+                var cy = window[container] = cytoscape({
 
-                    container: document.getElementById('cy'), // container to render in
+                    container: document.getElementById(container), // container to render in
 
                     elements: input.nodes,
                     style: [ // the stylesheet for the graph
