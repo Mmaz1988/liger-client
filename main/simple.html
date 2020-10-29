@@ -191,13 +191,15 @@
                 //alert( "SUCCESS:  " + data);
                 input = data;
                 console.log(data);
-                console.log(input.nodes);
+                if (input.hasOwnProperty("graphElements")) {
+                    console.log(input.graphElements);
+                }
 
                 var cy = window[container] = cytoscape({
 
                     container: document.getElementById(container), // container to render in
 
-                    elements: input.nodes,
+                    elements: input.graphElements,
                     style: [ // the stylesheet for the graph
                         {
                             selector: 'node[type="input"]',
