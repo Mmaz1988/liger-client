@@ -94,7 +94,7 @@
 <form action="#" onsubmit="return false;" id="demo_form">
     <label for="s1">Input sentence:</label><br>
     <input type="text" id="s1" name="sentence" value="John loves Mary"><br>
-    <input type="submit" value="Submit" onclick="process_sentence('s1','cy')">
+    <input type="submit" value="Submit" onclick="process_sentence('/graph-test','s1','cy')">
 </form>
 
 <h3 id="graph_window">
@@ -124,17 +124,17 @@
         <form action="#" onsubmit="return false;" id="demo_form2">
             <label for="s1">Input sentence:</label><br>
             <input type="text" id="s2" name="sentence" value="Peter loves Mary"><br>
-            <input type="submit" value="Submit" onclick="process_sentence('s2','cy2')">
+            <input type="submit" value="Submit" onclick="process_sentence('/semantics','s2','cy2','sem')">
         </form>
 
         <cy id='cy2'></cy>
-
+        <sem id="sem"></sem>
 
 
 <script>
     //Address of the controller on server side
-    var page = "http://localhost:8080/graph-test"
-    var input = "";
+    var page = "http://localhost:8080"
+ //   var input = "";
 
     //To add tool tips to elements (used to add avps to graphs)
     function makePopper(ele) {
@@ -162,7 +162,7 @@
     }
 
     //Reads in sentence and formats it for a request to server
-    function process_sentence(input_id,container)
+    function process_sentence(controller,input_id,graph_container,sem_container)
     {
         var sentence = document.getElementById(input_id).value;
         document.getElementById("graph_window").innerHTML = 'Now displaying graph for "' + sentence + '"';
@@ -171,29 +171,45 @@
         var params = { in: sentence}
         console.log("Generated parameter: " + params);
 
-        var url = page + formatParams(params);
+        var url = page + controller + formatParams(params);
         console.log("Make get request to: "+ url);
-        createGraph(url, container, function (data) {
-            //Callback
-        console.log(data);
-        });
-    }
 
-    //Makes a request to server to process input sentence. server returns a graph in json form
-    //The graph is embedded in a cytoscape graph visualization and displayed on the page.
-    function createGraph(url,container,callback) {
-
+        //Does the method need a callback to use this?
         $.ajax({
             url: url,
             dataType: 'json',
             type: 'post',
             success: function( data ) {
                 //alert( "SUCCESS:  " + data);
-                input = data;
+                var input = data;
                 console.log(data);
                 if (input.hasOwnProperty("graphElements")) {
                     console.log(input.graphElements);
                 }
+                createGraph(input,graph_container);
+
+                if (input.hasOwnProperty("semantics") && sem_container != null)
+                {
+                    createSemantics(input.semantics,sem_container);
+                }
+
+            },
+            error: function( data ) {
+                alert( "ERROR:  " + data);
+                console.log(data);
+            }
+        });
+    }
+
+    function createSemantics(semantics, container)
+    {
+        var container = document.getElementById(container);
+        container.innerHTML = semantics;
+    }
+
+    //Makes a request to server to process input sentence. server returns a graph in json form
+    //The graph is embedded in a cytoscape graph visualization and displayed on the page.
+    function createGraph(input,container) {
 
                 var cy = window[container] = cytoscape({
 
@@ -298,8 +314,8 @@
                 //Add tooltips to graph on mouseover
                 cy.ready(function() {
                     cy.elements().forEach(function(ele) {
-                        console.log(ele);
-                        console.log(ele._private.data);
+                      //  console.log(ele);
+                      //  console.log(ele._private.data);
                         if (ele._private.data.hasOwnProperty("avp")) {
                             makePopper(ele);
                         }
@@ -312,13 +328,6 @@
                 cy.elements().unbind('mouseout');
                 cy.elements().bind('mouseout', (event) => event.target.tippy.hide());
 
-
-            },
-            error: function( data ) {
-                alert( "ERROR:  " + data);
-                console.log(data);
-            }
-        });
 
   //      console.log("Read in: " + input);
    //     console.log("From: " + url);
