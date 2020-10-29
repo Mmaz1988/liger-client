@@ -94,10 +94,10 @@
 <form action="#" onsubmit="return false;" id="demo_form">
     <label for="s1">Input sentence:</label><br>
     <input type="text" id="s1" name="sentence" value="John loves Mary"><br>
-    <input type="submit" value="Submit" onclick="process_sentence('/graph-test','s1','cy')">
+    <input type="submit" value="Submit" onclick="process_sentence('/graph-test','s1','graph_window1','cy')">
 </form>
 
-<h3 id="graph_window">
+<h3 id="graph_window1">
     Graph should appear below here:
 </h3>
         <cy id = 'cy'></cy>
@@ -123,9 +123,13 @@
 
         <form action="#" onsubmit="return false;" id="demo_form2">
             <label for="s1">Input sentence:</label><br>
-            <input type="text" id="s2" name="sentence" value="Peter loves Mary"><br>
-            <input type="submit" value="Submit" onclick="process_sentence('/semantics','s2','cy2','sem')">
+            <input type="text" id="s2" name="sentence" value="every man loves a woman"><br>
+            <input type="submit" value="Submit" onclick="process_sentence('/semantics','s2','graph_window2','cy2','sem')">
         </form>
+
+        <h3 id="graph_window2">
+            Graph should appear below here:
+        </h3>
 
         <cy id='cy2'></cy>
         <sem id="sem"></sem>
@@ -162,10 +166,10 @@
     }
 
     //Reads in sentence and formats it for a request to server
-    function process_sentence(controller,input_id,graph_container,sem_container)
+    function process_sentence(controller,input_id,graph_window, graph_container,sem_container)
     {
         var sentence = document.getElementById(input_id).value;
-        document.getElementById("graph_window").innerHTML = 'Now displaying graph for "' + sentence + '"';
+        document.getElementById(graph_window).innerHTML = 'Now displaying graph for "' + sentence + '"';
         console.log("Read in sentence:" + sentence)
 
         var params = { in: sentence}

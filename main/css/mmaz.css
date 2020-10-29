@@ -19,15 +19,16 @@ sem {
 	font-variant: normal;
 	font-weight: 400;
 	line-height: 20px;
-	width: 800px;
-	min-height: 30px;
-	max-height: 90px;
+	width: 750px;
+	height: 50px;
 	display: block;
 	border-style: solid;
 	border-radius: 25px;
 	border-color: #00a9e0;
-	padding: 5px;
 	margin: 5px;
+	overflow: auto;
+	padding-left: 25px;
+	padding-right: 25px;
 }
 
 h1 {
