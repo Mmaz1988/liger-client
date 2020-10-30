@@ -9,6 +9,8 @@
             integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.16.2/cytoscape.min.js"></script>
+    <script src="https://cdn.rawgit.com/cpettitt/dagre/v0.7.4/dist/dagre.min.js"></script>
+    <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-dagre/1.5.0/cytoscape-dagre.js"></script>
     <script src="https://unpkg.com/popper.js@1.14.7/dist/umd/popper.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-popper@1.0.4/cytoscape-popper.min.js"></script>
     <script src="https://unpkg.com/tippy.js@4.0.1/umd/index.all.min.js"></script>
@@ -38,6 +40,7 @@
             <li><a href="#demo_form"> The demo </a> </li>
             <li><a href="#semantics_demo">Glue semantics</a> </li>
         </ul>
+
 <!--
         <ul>
             <li><a href= "index.html"> Home </a> </li>
@@ -46,6 +49,7 @@
             <li><a href= "teachings.html"> Teachings </a> </li>
         </ul>
 -->
+
     </nav>
 
     <article>
@@ -94,7 +98,7 @@
 <form action="#" onsubmit="return false;" id="demo_form">
     <label for="s1">Input sentence:</label><br>
     <input type="text" id="s1" name="sentence" value="John loves Mary"><br>
-    <input type="submit" value="Submit" onclick="process_sentence('/graph-test','s1','graph_window1','cy')">
+    <input type="submit" value="Submit" onclick="process_sentence('/annotate','s1','graph_window1','cy')">
 </form>
 
 <h3 id="graph_window1">
@@ -277,14 +281,14 @@
                             css: {
                                 "label": "data(label)",
                                 "text-rotation": "autorotate",
-                                "text-margin-x": "0px",
-                                "text-margin-y": "-15px"
+                                "text-margin-x": "15px",
+                                "text-margin-y": "0px"
                             }
                         }
                     ],
 
                     layout: {
-                        name: 'breadthfirst'
+                        name: 'dagre'
                         //  rows: 1
                     }
 
@@ -322,15 +326,16 @@
                       //  console.log(ele._private.data);
                         if (ele._private.data.hasOwnProperty("avp")) {
                             makePopper(ele);
+
+                            ele.bind('mouseover', (event) => event.target.tippy.show());
+
+                            //       cy.elements().unbind('mouseout');
+                            ele.bind('mouseout', (event) => event.target.tippy.hide());
+
                         }
                     });
                 });
 
-                cy.elements().unbind('mouseover');
-                cy.elements().bind('mouseover', (event) => event.target.tippy.show());
-
-                cy.elements().unbind('mouseout');
-                cy.elements().bind('mouseout', (event) => event.target.tippy.hide());
 
 
   //      console.log("Read in: " + input);
