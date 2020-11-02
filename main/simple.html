@@ -126,9 +126,9 @@
         </p>
 
         <form action="#" onsubmit="return false;" id="demo_form2">
-            <label for="s1">Input sentence:</label><br>
+            <label for="s2">Input sentence:</label><br>
             <input type="text" id="s2" name="sentence" value="every man loves a woman"><br>
-            <input type="submit" value="Submit" onclick="process_sentence('/semantics','s2','graph_window2','cy2','sem')">
+            <input type="submit" value="Submit" onclick="process_sentence('/semantics','s2','graph_window2','cy2','sem1')">
         </form>
 
         <h3 id="graph_window2">
@@ -136,10 +136,43 @@
         </h3>
 
         <cy id='cy2'></cy>
-        <sem id="sem"></sem>
+        <sem id="sem1"></sem>
 
 
-<script>
+        <h2 id="rules_demo">
+            How to write rules
+        </h2>
+
+        <form action="#" onsubmit="return false;" id="demo_form3">
+        <label for="test_sent">Test sentences:</label> <br>
+        <select name="test_sent" id='test_sent'>
+            <option value="John loves Mary.">John loves Mary.</option>
+            <option value="Every man loves a woman.">Every man loves a woman.</option>
+            <option value="Mary has visited her mother.">Mary has visited her mother. </option>
+            <option value="John said that Mary was sick.">John said that Mary was sick.</option>
+        </select>
+        <br>
+            <input type="submit" value="Submit"
+                   onclick="process_sentence('/parse','test_sent','graph_window3','cy3')">
+            <br>
+
+            <label for="s4">Input rule:</label><br>
+            <textarea class = "rule" id="s4" name="sentence">#a POS VBZ & #a TOKEN %a ==> #a M-STR #b & #b FIN '+' & #b TENSE 'pres' & #b HEAD %a.</textarea> <br>
+            <input type="submit" value="Submit" onclick="annotateSentence('/apply_rule','s4','test_sent','graph_window3','cy3','sem2')">
+
+        </form>
+
+
+        <h3 id="graph_window3">
+            Graph should appear below here:
+        </h3>
+
+        <cy id='cy3'></cy>
+        <sem id="sem2"></sem>
+
+
+
+        <script>
     //Address of the controller on server side
     var page = "http://localhost:8080"
  //   var input = "";
@@ -208,6 +241,44 @@
             }
         });
     }
+
+    function annotateSentence(controller,inputId,sentenceWindow,graphWindow,graphContainer,semContainer) {
+        var sentence = document.getElementById(sentenceWindow).value;
+        var ruleString = document.getElementById(inputId).value;
+        document.getElementById(graphWindow).innerHTML = 'Now displaying graph for "' + sentence + '"';
+        console.log("Read in sentence:" + sentence)
+
+
+
+            $.ajax({
+                url : page + controller,
+                contentType: "application/json; charset=utf-8",
+                type: 'POST',
+               // async: false,
+                cache: false,
+                data: JSON.stringify({ sentence: sentence, ruleString: ruleString }),
+                success: function (data) {
+
+                    if (data.hasOwnProperty("graphElements")) {
+                        console.log(data.graphElements);
+                    }
+                    createGraph(data,graphContainer);
+
+                    if (data.hasOwnProperty("semantics") && semContainer != null)
+                    {
+                        createSemantics(data.semantics,semContainer);
+                    }
+
+
+                },
+                error: function( data ) {
+                    alert( "ERROR:  " + data);
+                    console.log(data);
+
+        }
+            });
+    }
+
 
     function createSemantics(semantics, container)
     {

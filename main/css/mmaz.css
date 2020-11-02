@@ -2,6 +2,13 @@
 
 @import 'https://fonts.googleapis.com/css?family=Open+Sans';
 
+textarea.rule {
+	width: 600px;
+	height: 90px;
+	overflow: auto;
+	display: block;
+}
+
 cy {
 	width: 800px;
 	height: 600px;
@@ -101,7 +108,6 @@ div.container {
     width: 100%;
     border: 1px solid gray;
 }
-
 
 
 top {
