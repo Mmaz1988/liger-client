@@ -17,38 +17,38 @@
 </head>
 
 <top>
-<banner>
-    <a href="http://www.uni-konstanz.de/" target="_blank">
-        <img style="border: 0;" src="images/logo.svg" alt="unilogo" width="160" height="135"
-             title="Uni Konstanz" align="left">
-    </a>
-</banner>
-<header>
-    <h1>Testpage of the Abstract Syntax Annotator </h1>
-    <h2>
-        Written by Mark-Matthias Zymla <br>
-    </h2>
-</header>
+    <banner>
+        <a href="http://www.uni-konstanz.de/" target="_blank">
+            <img style="border: 0;" src="images/logo.svg" alt="unilogo" width="160" height="135"
+                 title="Uni Konstanz" align="left">
+        </a>
+    </banner>
+    <header>
+        <h1>Testpage of the Abstract Syntax Annotator </h1>
+        <h2>
+            Written by Mark-Matthias Zymla <br>
+        </h2>
+    </header>
 </top>
 <container>
 
     <nav>
 
         <ul>
-            <li><a href="#abstract_syntax_annotator"> Introduction </a> </li>
-            <li><a href="#simple_demo"> Demo description </a> </li>
-            <li><a href="#demo_form"> The demo </a> </li>
-            <li><a href="#semantics_demo">Glue semantics</a> </li>
+            <li><a href="#abstract_syntax_annotator"> Introduction </a></li>
+            <li><a href="#simple_demo"> Demo description </a></li>
+            <li><a href="#demo_form"> The demo </a></li>
+            <li><a href="#semantics_demo">Glue semantics</a></li>
         </ul>
 
-<!--
-        <ul>
-            <li><a href= "index.html"> Home </a> </li>
-            <li><a href= "projects.html"> Projects </a> </li>
-            <li><a href= "publications.html"> Research </a> </li>
-            <li><a href= "teachings.html"> Teachings </a> </li>
-        </ul>
--->
+        <!--
+                <ul>
+                    <li><a href= "index.html"> Home </a> </li>
+                    <li><a href= "projects.html"> Projects </a> </li>
+                    <li><a href= "publications.html"> Research </a> </li>
+                    <li><a href= "teachings.html"> Teachings </a> </li>
+                </ul>
+        -->
 
     </nav>
 
@@ -63,23 +63,26 @@
             add annotations to syntactic analyses of natural language expressions. In particular, the system focuses
             on analyses provided by two syntactic frameworks, namely, LFG (as implemented in the Xerox Lingustics
             Environment (XLE)), and Universal Dependencies (as implemented in the Stanford CoreNLP library).
-            </p>
-            <p>
+        </p>
+        <p>
             The system translates (parts) of LFG and UD representations into more abstract linguistic annotation graphs
             and allows the user to apply transfer rules (an expression coined by the XLE transfer system) to rewrite
             and expand on linguistic annotations. The system is inspired by the previously mentioned transfer component
-                of the XLE, the packed rewrite system, which is, unfortunately not supported by XLE anymore.
-                The abstract syntactic annotator aims at picking up this legacy and  provides a framework independent
-                rule system for expansion or rewriting of linguistic annotations.
-            </p>
+            of the XLE, the packed rewrite system, which is, unfortunately not supported by XLE anymore.
+            The abstract syntactic annotator aims at picking up this legacy and provides a framework independent
+            rule system for expansion or rewriting of linguistic annotations.
+        </p>
         <p>
-            In addition to adding linguistic annotations (i.e., relational information and linguistic feature information)
-            the system is also coupled with the Glue Semantics Workbench (GSWB), a glue semantics prover written in Java.
+            In addition to adding linguistic annotations (i.e., relational information and linguistic feature
+            information)
+            the system is also coupled with the Glue Semantics Workbench (GSWB), a glue semantics prover written in
+            Java.
             To make use of the GSWB, the system also allows users to write rules that directly produce glue semantics
             representations based on a description-by-analysis framework.
         </p>
         <p>
-            This page provides a simple demo of the system with a visualization component to better explain the capabilities
+            This page provides a simple demo of the system with a visualization component to better explain the
+            capabilities
             of the system.
         </p>
 
@@ -88,35 +91,45 @@
         </h2>
 
         <p>The simple demo adds abstract tense and aspect information to a universal dependency graph. More concretely,
-        it aggregates syntactic features into semantically interpretable features. It abstracts away from complex syntactic structures
-        to a simple attribute/value matrix for tense and aspect. For this purpose it uses the rules listed in
-        <a href="test_files/testRulesUD4.txt" target="_blank">TAM-conversion rules</a>. The final result of this conversion is given
-        in the TAM node. These test rules follow, to some extent, the best practices of encoding tense and aspect in XLE
-        in accordance with the <a href="https://pargram.w.uib.no/" target="_blank">ParGram project</a>, providing
-        a flat analysis of complex auxiliary constructions (e.g. English perfect, and progressive).</p>
+            it aggregates syntactic features into semantically interpretable features. It abstracts away from complex
+            syntactic structures
+            to a simple attribute/value matrix for tense and aspect. For this purpose it uses the rules listed in
+            <a href="test_files/testRulesUD4.txt" target="_blank">TAM-conversion rules</a>. The final result of this
+            conversion is given
+            in the TAM node. These test rules follow, to some extent, the best practices of encoding tense and aspect in
+            XLE
+            in accordance with the <a href="https://pargram.w.uib.no/" target="_blank">ParGram project</a>, providing
+            a flat analysis of complex auxiliary constructions (e.g. English perfect, and progressive).</p>
+        <ul class="a">
+            <li>Light blue circles describe the initial syntactic analysis (a UD dependency parse)</li>
+            <li>Red circles describe the added annotation</li>
+        </ul>
 
-<form action="#" onsubmit="return false;" id="demo_form">
-    <label for="s1">Input sentence:</label><br>
-    <input type="text" id="s1" name="sentence" value="John loves Mary"><br>
-    <input type="submit" value="Submit" onclick="process_sentence('/annotate','s1','graph_window1','cy')">
-</form>
+        <form action="#" onsubmit="return false;" id="demo_form">
+            <label for="s1">Input sentence:</label><br>
+            <input type="text" id="s1" name="sentence" value="John loves Mary."><br>
+            <input type="submit" value="Submit" onclick="process_sentence('/annotate','s1','graph_window1','cy')">
+        </form>
 
-<h3 id="graph_window1">
-    Graph should appear below here:
-</h3>
-        <cy id = 'cy'></cy>
+        <h3 id="graph_window1">
+            Graph should appear below here:
+        </h3>
+        <cy id='cy'></cy>
 
 
-<h2 id="semantics_demo">
-    Glue semantics integration demo
-</h2>
+        <h2 id="semantics_demo">
+            Glue semantics integration demo
+        </h2>
 
- <p>
-     In addition to adding relational and attribute/value information, the abstract syntax annotator also allows users
-     to design rules that produce semantic representations. More concretely, the system allows users to add meaning
-     constructors, semantic representations used in Glue semantics. Rules for semantic interpretation initialize a set
-     of nodes the indices of which serve the generation of linear logic formulas.
- </p>
+        <p>
+            In addition to adding relational and attribute/value information, the abstract syntax annotator also allows
+            users
+            to design rules that produce semantic representations. More concretely, the system allows users to add
+            meaning
+            constructors, semantic representations used in Glue semantics. Rules for semantic interpretation initialize
+            a set
+            of nodes the indices of which serve the generation of linear logic formulas.
+        </p>
         <p>
             The system uses the rules in
             <a href="test_files/testRulesUD1.txt" target="_blank">semantic interpretation rules</a> to produce meaning
@@ -127,8 +140,9 @@
 
         <form action="#" onsubmit="return false;" id="demo_form2">
             <label for="s2">Input sentence:</label><br>
-            <input type="text" id="s2" name="sentence" value="every man loves a woman"><br>
-            <input type="submit" value="Submit" onclick="process_sentence('/semantics','s2','graph_window2','cy2','sem1')">
+            <input type="text" id="s2" name="sentence" value="Every man loves a woman."><br>
+            <input type="submit" value="Submit"
+                   onclick="process_sentence('/semantics','s2','graph_window2','cy2','sem1')">
         </form>
 
         <h3 id="graph_window2">
@@ -144,21 +158,23 @@
         </h2>
 
         <form action="#" onsubmit="return false;" id="demo_form3">
-        <label for="test_sent">Test sentences:</label> <br>
-        <select name="test_sent" id='test_sent'>
-            <option value="John loves Mary.">John loves Mary.</option>
-            <option value="Every man loves a woman.">Every man loves a woman.</option>
-            <option value="Mary has visited her mother.">Mary has visited her mother. </option>
-            <option value="John said that Mary was sick.">John said that Mary was sick.</option>
-        </select>
-        <br>
+            <label for="test_sent">Test sentences:</label> <br>
+            <select name="test_sent" id='test_sent'>
+                <option value="John loves Mary.">John loves Mary.</option>
+                <option value="Every man loves a woman.">Every man loves a woman.</option>
+                <option value="Mary has visited her mother.">Mary has visited her mother.</option>
+                <option value="John said that Mary was sick.">John said that Mary was sick.</option>
+            </select>
+            <br>
             <input type="submit" value="Submit"
                    onclick="process_sentence('/parse','test_sent','graph_window3','cy3')">
             <br>
 
             <label for="s4">Input rule:</label><br>
-            <textarea class = "rule" id="s4" name="sentence">#a POS VBZ & #a TOKEN %a ==> #a M-STR #b & #b FIN '+' & #b TENSE 'pres' & #b HEAD %a.</textarea> <br>
-            <input type="submit" value="Submit" onclick="annotateSentence('/apply_rule','s4','test_sent','graph_window3','cy3','sem2')">
+            <textarea class="rule" id="s4" name="sentence">#a POS VBZ & #a TOKEN %a ==> #a M-STR #b & #b FIN '+' & #b TENSE 'pres' & #b HEAD %a.</textarea>
+            <br>
+            <input type="submit" value="Submit"
+                   onclick="annotateSentence('/apply_rule','s4','test_sent','graph_window3','cy3','sem2')">
 
         </form>
 
@@ -170,125 +186,145 @@
         <cy id='cy3'></cy>
         <sem id="sem2"></sem>
 
+        <h2 id="treebank_demo"></h2>
+
+        <wrapper>
+            <wrapper style="float: left">
+                <select id="treebank_list" name="treebank" class="treebank" size="10">
+                    <option value="item1">Item 1
+                    <option value="item2">Item 2
+                    <option value="item3">Item 3
+                </select><br>
+                <input type="submit" value="Laod treebank" onclick="console.log('Pressed a button')"
+                       style="width: 200px;
+                   font-family: Open Sans;
+                   font-size: 14px;
+	               font-style: normal;
+	               font-variant: normal;
+	               font-weight: 400;
+                   height: 50px;
+                   border-color: #00a9e0;
+                   color: #00a9e0">
+            </wrapper>
+            <wrapper style="float: left">
+                <cy id='cy4'></cy>
+                <sem id="sem3"></sem>
+            </wrapper>
+        </wrapper>
 
 
         <script>
-    //Address of the controller on server side
-    var page = "http://localhost:8080"
- //   var input = "";
+            //Address of the controller on server side
+            var page = "http://localhost:8080"
+            //   var input = "";
 
-    //To add tool tips to elements (used to add avps to graphs)
-    function makePopper(ele) {
-        let ref = ele.popperRef(); // used only for positioning
+            //To add tool tips to elements (used to add avps to graphs)
+            function makePopper(ele) {
+                let ref = ele.popperRef(); // used only for positioning
 
-        ele.tippy = tippy(ref, { // tippy options:
-            content: () => {
-                let content = document.createElement('div');
+                ele.tippy = tippy(ref, { // tippy options:
+                    content: () => {
+                        let content = document.createElement('div');
 
-                var attributes = ele._private.data;
-                console.log(attributes);
+                        var attributes = ele._private.data;
+                        console.log(attributes);
 
-                if (attributes.hasOwnProperty("avp")) {
-                    for (var key in attributes.avp) {
-                        content.innerHTML = content.innerHTML + key + " : " + attributes.avp[key] + "<br>";
-                    }
-                }
+                        if (attributes.hasOwnProperty("avp")) {
+                            for (var key in attributes.avp) {
+                                content.innerHTML = content.innerHTML + key + " : " + attributes.avp[key] + "<br>";
+                            }
+                        }
 
-                //content.innerHTML = ele.id();
+                        //content.innerHTML = ele.id();
 
-                return content;
-            },
-            trigger: 'manual' // probably want manual mode
-        });
-    }
-
-    //Reads in sentence and formats it for a request to server
-    function process_sentence(controller,input_id,graph_window, graph_container,sem_container)
-    {
-        var sentence = document.getElementById(input_id).value;
-        document.getElementById(graph_window).innerHTML = 'Now displaying graph for "' + sentence + '"';
-        console.log("Read in sentence:" + sentence)
-
-        var params = { in: sentence}
-        console.log("Generated parameter: " + params);
-
-        var url = page + controller + formatParams(params);
-        console.log("Make get request to: "+ url);
-
-        //Does the method need a callback to use this?
-        $.ajax({
-            url: url,
-            dataType: 'json',
-            type: 'post',
-            success: function( data ) {
-                //alert( "SUCCESS:  " + data);
-                var input = data;
-                console.log(data);
-                if (input.hasOwnProperty("graphElements")) {
-                    console.log(input.graphElements);
-                }
-                createGraph(input,graph_container);
-
-                if (input.hasOwnProperty("semantics") && sem_container != null)
-                {
-                    createSemantics(input.semantics,sem_container);
-                }
-
-            },
-            error: function( data ) {
-                alert( "ERROR:  " + data);
-                console.log(data);
+                        return content;
+                    },
+                    trigger: 'manual' // probably want manual mode
+                });
             }
-        });
-    }
 
-    function annotateSentence(controller,inputId,sentenceWindow,graphWindow,graphContainer,semContainer) {
-        var sentence = document.getElementById(sentenceWindow).value;
-        var ruleString = document.getElementById(inputId).value;
-        document.getElementById(graphWindow).innerHTML = 'Now displaying graph for "' + sentence + '"';
-        console.log("Read in sentence:" + sentence)
+            //Reads in sentence and formats it for a request to server
+            function process_sentence(controller, input_id, graph_window, graph_container, sem_container) {
+                var sentence = document.getElementById(input_id).value;
+                document.getElementById(graph_window).innerHTML = 'Now displaying graph for "' + sentence + '"';
+                console.log("Read in sentence:" + sentence)
 
+                var params = {in: sentence}
+                console.log("Generated parameter: " + params);
 
+                var url = page + controller + formatParams(params);
+                console.log("Make get request to: " + url);
 
-            $.ajax({
-                url : page + controller,
-                contentType: "application/json; charset=utf-8",
-                type: 'POST',
-               // async: false,
-                cache: false,
-                data: JSON.stringify({ sentence: sentence, ruleString: ruleString }),
-                success: function (data) {
+                //Does the method need a callback to use this?
+                $.ajax({
+                    url: url,
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (data) {
+                        //alert( "SUCCESS:  " + data);
+                        var input = data;
+                        console.log(data);
+                        if (input.hasOwnProperty("graphElements")) {
+                            console.log(input.graphElements);
+                        }
+                        createGraph(input, graph_container);
 
-                    if (data.hasOwnProperty("graphElements")) {
-                        console.log(data.graphElements);
+                        if (input.hasOwnProperty("semantics") && sem_container != null) {
+                            createSemantics(input.semantics, sem_container);
+                        }
+
+                    },
+                    error: function (data) {
+                        alert("ERROR:  " + data);
+                        console.log(data);
                     }
-                    createGraph(data,graphContainer);
+                });
+            }
 
-                    if (data.hasOwnProperty("semantics") && semContainer != null)
-                    {
-                        createSemantics(data.semantics,semContainer);
+            function annotateSentence(controller, inputId, sentenceWindow, graphWindow, graphContainer, semContainer) {
+                var sentence = document.getElementById(sentenceWindow).value;
+                var ruleString = document.getElementById(inputId).value;
+                document.getElementById(graphWindow).innerHTML = 'Now displaying graph for "' + sentence + '"';
+                console.log("Read in sentence:" + sentence)
+
+
+                $.ajax({
+                    url: page + controller,
+                    contentType: "application/json; charset=utf-8",
+                    type: 'POST',
+                    // async: false,
+                    cache: false,
+                    data: JSON.stringify({sentence: sentence, ruleString: ruleString}),
+                    success: function (data) {
+
+                        if (data.hasOwnProperty("graphElements")) {
+                            console.log(data.graphElements);
+                        }
+                        createGraph(data, graphContainer);
+
+                        if (data.hasOwnProperty("semantics") && semContainer != null) {
+                            createSemantics(data.semantics, semContainer);
+                        }
+
+
+                    },
+                    error: function (data) {
+                        alert("ERROR:  " + data);
+                        console.log(data);
+
                     }
+                });
+            }
 
 
-                },
-                error: function( data ) {
-                    alert( "ERROR:  " + data);
-                    console.log(data);
+            function createSemantics(semantics, container) {
+                var container = document.getElementById(container);
+                container.innerHTML = semantics;
+            }
 
-        }
-            });
-    }
-
-
-    function createSemantics(semantics, container)
-    {
-        var container = document.getElementById(container);
-        container.innerHTML = semantics;
-    }
-
-    //Makes a request to server to process input sentence. server returns a graph in json form
-    //The graph is embedded in a cytoscape graph visualization and displayed on the page.
-    function createGraph(input,container) {
+            //Makes a request to server to process input sentence. server returns a graph in json form
+            //The graph is embedded in a cytoscape graph visualization and displayed on the page.
+            function createGraph(input, container) {
 
                 var cy = window[container] = cytoscape({
 
@@ -391,10 +427,10 @@
 
 
                 //Add tooltips to graph on mouseover
-                cy.ready(function() {
-                    cy.elements().forEach(function(ele) {
-                      //  console.log(ele);
-                      //  console.log(ele._private.data);
+                cy.ready(function () {
+                    cy.elements().forEach(function (ele) {
+                        //  console.log(ele);
+                        //  console.log(ele._private.data);
                         if (ele._private.data.hasOwnProperty("avp")) {
                             makePopper(ele);
 
@@ -408,24 +444,23 @@
                 });
 
 
+                //      console.log("Read in: " + input);
+                //     console.log("From: " + url);
+            }
 
-  //      console.log("Read in: " + input);
-   //     console.log("From: " + url);
-    }
 
+            //Formats input json into a string that can be appended to a server request as parameter
+            function formatParams(params) {
+                return "?" + Object
+                    .keys(params)
+                    .map(function (key) {
+                        return key + "=" + encodeURIComponent(params[key])
+                    })
+                    .join("&")
+            }
 
- //Formats input json into a string that can be appended to a server request as parameter
-    function formatParams( params ){
-        return "?" + Object
-            .keys(params)
-            .map(function(key){
-                return key+"="+encodeURIComponent(params[key])
-            })
-            .join("&")
-    }
-
-//Container for displaying the graph produced by callREST()
-</script>
+            //Container for displaying the graph produced by callREST()
+        </script>
     </article>
 </container>
 </html>
