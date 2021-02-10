@@ -171,7 +171,7 @@
             <br>
 
             <label for="s4">Input rule:</label><br>
-            <textarea class="rule" id="s4" name="sentence">#a POS VBZ & #a TOKEN %a ==> #a M-STR #b & #b FIN '+' & #b TENSE 'pres' & #b HEAD %a.</textarea>
+            <textarea class="rule" id="s4" name="sentence">#a POS VBZ & #a TOKEN %a ==> #a MORPH #b & #b FIN '+' & #b TENSE 'pres' & #b HEAD %a.</textarea>
             <br>
             <input type="submit" value="Submit"
                    onclick="annotateSentence('/apply_rule','s4','test_sent','graph_window3','cy3','sem2')">
@@ -186,6 +186,8 @@
         <cy id='cy3'></cy>
         <sem id="sem2"></sem>
 
+        <!--
+
         <h2 id="treebank_demo"></h2>
 
         <wrapper>
@@ -195,7 +197,7 @@
                     <option value="item2">Item 2
                     <option value="item3">Item 3
                 </select><br>
-                <input type="submit" value="Laod treebank" onclick="console.log('Pressed a button')"
+                <input type="submit" value="Load treebank" onclick="console.log('Pressed a button')"
                        style="width: 200px;
                    font-family: Open Sans;
                    font-size: 14px;
@@ -211,7 +213,7 @@
                 <sem id="sem3"></sem>
             </wrapper>
         </wrapper>
-
+-->
 
         <script>
             //Address of the controller on server side
