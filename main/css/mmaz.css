@@ -43,6 +43,7 @@ cy {
 }
 
 sem {
+	white-space: pre-wrap;
 	font-family: Open Sans;
 	font-size: 14px;
 	font-style: normal;
