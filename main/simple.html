@@ -86,6 +86,23 @@
             of the system.
         </p>
 
+        <h2 id="querying">Querying: </h2>
+
+
+        <form action="#" onsubmit="return false;" id="demo_form4">
+            <label for="s2">Input sentence:</label><br>
+            <input type="text" id="s5" name="sentence" value="Every man loves a woman."><br>
+        </form>
+
+        <label for="s4">Input rule:</label><br>
+        <textarea class="query" id="s6" name="sentence">#a POS VBZ</textarea>
+        <br>
+        <input type="submit" value="Submit"
+               onclick="querySentence('/query','s6','s5','sem4')">
+
+        <sem id="sem4"></sem>
+
+
         <h2 id="simple_demo">
             Simple Demo:
         </h2>
@@ -186,6 +203,23 @@
         <cy id='cy3'></cy>
         <sem id="sem2"></sem>
 
+
+        <h1>
+            GKR interface
+        </h1>
+
+        <label for="s4">Input sentence:</label><br>
+        <textarea class="rule" id="s7" name="sentence">Peter doubts that Mary loves Jordan.</textarea>
+        <br>
+
+        <label for="s4">Input context:</label><br>
+        <textarea class="rule" id="s8">""</textarea>
+        <br>
+        <input type="submit" value="Submit"
+               onclick="annotateSentence('/apply_rule','s4','test_sent','graph_window3','cy3','sem2')">
+
+
+
         <!--
 
         <h2 id="treebank_demo"></h2>
@@ -244,6 +278,7 @@
                     trigger: 'manual' // probably want manual mode
                 });
             }
+
 
             //Reads in sentence and formats it for a request to server
             function process_sentence(controller, input_id, graph_window, graph_container, sem_container) {
@@ -319,6 +354,42 @@
             }
 
 
+            function querySentence(controller, inputId, sentenceWindow, resultContainer) {
+                var sentence = document.getElementById(sentenceWindow).value;
+                var ruleString = document.getElementById(inputId).value;
+               // document.getElementById(graphWindow).innerHTML = 'Now displaying graph for "' + sentence + '"';
+                console.log("Read in sentence:" + sentence)
+                console.log("Read in query:" + ruleString)
+
+
+                $.ajax({
+                    url: page + controller,
+                    contentType: "application/json; charset=utf-8",
+                    type: 'POST',
+                    // async: false,
+                    cache: false,
+                    data: JSON.stringify({sentence: sentence, ruleString: ruleString}),
+                    success: function (data) {
+
+                        if (data.hasOwnProperty("success")) {
+                            console.log(data.success);
+                        }
+
+                        if (data.hasOwnProperty("success") && resultContainer != null) {
+                            createSemantics(data.success, resultContainer);
+                        }
+
+
+                    },
+                    error: function (data) {
+                        alert("ERROR:  " + data);
+                        console.log(data);
+                        console.log(page+controller + JSON.stringify({sentence: sentence, ruleString: ruleString}));
+
+                    }
+                });
+            }
+
             function createSemantics(semantics, container) {
                 var container = document.getElementById(container);
                 container.innerHTML = semantics;
@@ -335,7 +406,7 @@
                     elements: input.graphElements,
                     style: [ // the stylesheet for the graph
                         {
-                            selector: 'node[type="input"]',
+                            selector: 'node[node_type="input"]',
                             css: {
                                 "content": "data(id)",
                                 "color": "blue",
@@ -349,7 +420,7 @@
                             }
                         },
                         {
-                            selector: 'node[type="annotation"]',
+                            selector: 'node[node_type="annotation"]',
                             css: {
                                 "content": "data(id)",
                                 "color": "blue",
@@ -363,7 +434,7 @@
                             }
                         },
                         {
-                            selector: 'edge[type="edge"]',
+                            selector: 'edge[edge_type="edge"]',
                             style: {
                                 'width': 3,
                                 'line-color': '#ccc',
@@ -374,7 +445,7 @@
                             }
                         },
                         {
-                            selector: 'edge[type="proj"]',
+                            selector: 'edge[edge_type="proj"]',
                             style: {
                                 'width': 3,
                                 'line-color': '#ccc',
