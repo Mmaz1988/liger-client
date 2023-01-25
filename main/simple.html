@@ -216,7 +216,7 @@
         <textarea class="rule" id="s8">""</textarea>
         <br>
         <input type="submit" value="Submit"
-               onclick="annotateSentence('/apply_rule','s4','test_sent','graph_window3','cy3','sem2')">
+               onclick="annotateGKRSentence('s7','s8')">
 
 
 
@@ -353,6 +353,37 @@
                 });
             }
 
+            function annotateGKRSentence(sentenceID, contextID)
+            {
+                var sentence = document.getElementById(sentenceID);
+                var context = document.getElementById(contextID);
+
+
+                var result;
+
+                $.ajax({
+                    url: "https://public.gkr.services.lingvis.io/actuator/health",
+                    contentType: "application/json; charset=utf-8",
+                    type: 'GET',
+                    // async: false,
+                    dataType: 'application/json',
+                    cache: false,
+                    //data: JSON.stringify({sentence: sentence, context: context}),
+                    success: function(data) {
+
+                        result = data;
+                      console.log(result);
+
+                    },
+                    error: function (data) {
+                        alert("ERROR:  " + data);
+                        console.log(data);
+
+                    }
+                });
+
+            }
+
 
             function querySentence(controller, inputId, sentenceWindow, resultContainer) {
                 var sentence = document.getElementById(sentenceWindow).value;
@@ -389,6 +420,7 @@
                     }
                 });
             }
+
 
             function createSemantics(semantics, container) {
                 var container = document.getElementById(container);
