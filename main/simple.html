@@ -5,8 +5,9 @@
 
     <link rel="stylesheet" href="css/mmaz.css">
     <link rel="stylesheet" href="css/opensans.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.js"
-            integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+    <script
+            src="https://code.jquery.com/jquery-3.6.0.js"
+            integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.16.2/cytoscape.min.js"></script>
     <script src="https://cdn.rawgit.com/cpettitt/dagre/v0.7.4/dist/dagre.min.js"></script>
@@ -98,9 +99,38 @@
         <textarea class="query" id="s6" name="sentence">#a POS VBZ</textarea>
         <br>
         <input type="submit" value="Submit"
-               onclick="querySentence('/query','s6','s5','sem4')">
+               onclick="querySentence('/annotate_gkr','s6','s5','sem4')">
 
         <sem id="sem4"></sem>
+
+
+        <h2 id="annotate_args">Argument annotation: </h2>
+
+
+        <form action="#" onsubmit="return false;" id="demo_form10">
+            <label>Premise:</label><br>
+            <input type="text" id="s101" name="sentence" value="Covid has a 2% mortality rate."><br>
+        </form>
+
+        <form action="#" onsubmit="return false;" id="demo_form11">
+            <label>Conclusion:</label><br>
+            <input type="text" id="s102" name="sentence" value="Covid is dangerous."><br>
+        </form>
+
+        <form action="#" onsubmit="return false;" id="demo_form12">
+            <label for="relation">Test sentences:</label> <br>
+            <select name="relation" id='relation'>
+                <option value="support">support</option>
+                <option value="attack">attack</option>
+                <option value="rephrase">rephrase</option>
+            </select>
+        </form>
+
+        <input type="submit" value="Submit"
+               onclick="annotateArguments('s101','s102','relation' ,'res101')">
+
+        <sem id="res101"></sem>
+
 
 
         <h2 id="simple_demo">
@@ -353,24 +383,26 @@
 
             function annotateGKRSentence(sentenceID, contextID)
             {
-                var sentence = document.getElementById(sentenceID);
-                var context = document.getElementById(contextID);
+                var sentence = document.getElementById(sentenceID).value;
+                var context = document.getElementById(contextID).value;
 
+                console.log(sentence);
+                console.log(context);
 
                 var result;
 
                 $.ajax({
-                    url: "https://public.gkr.services.lingvis.io/actuator/health",
+                    url: "https://public.gkr.services.lingvis.io/gkr/sentence",
                     contentType: "application/json; charset=utf-8",
-                    type: 'GET',
+                    type: 'POST',
                     // async: false,
-                    dataType: 'application/json',
+                    //dataType: 'application/json',
                     cache: false,
-                    //data: JSON.stringify({sentence: sentence, context: context}),
+                    data: JSON.stringify({sentence: sentence, context: ""}),
                     success: function(data) {
 
-                        result = data;
-                        console.log(result);
+                        console.log('success');
+                        console.log(data);
 
                     },
                     error: function (data) {
@@ -414,6 +446,74 @@
                         alert("ERROR:  " + data);
                         console.log(data);
                         console.log(page+controller + JSON.stringify({sentence: sentence, ruleString: ruleString}));
+
+                    }
+                });
+            }
+
+            function sentence2akr(controller, inputId, sentenceWindow, resultContainer) {
+                var sentence = document.getElementById(sentenceWindow).value;
+                var ruleString = document.getElementById(inputId).value;
+                // document.getElementById(graphWindow).innerHTML = 'Now displaying graph for "' + sentence + '"';
+                console.log("Read in sentence:" + sentence)
+                console.log("Read in query:" + ruleString)
+
+
+                $.ajax({
+                    url: page + controller,
+                    contentType: "application/json; charset=utf-8",
+                    type: 'POST',
+                    // async: false,
+                    cache: false,
+                    data: JSON.stringify({sentence: sentence, ruleString: ruleString}),
+                    success: function (data) {
+
+                        if (data.hasOwnProperty("success")) {
+                            console.log(data.success);
+                        }
+
+                        if (data.hasOwnProperty("success") && resultContainer != null) {
+                            createSemantics(data.success, resultContainer);
+                        }
+
+
+                    },
+                    error: function (data) {
+                        alert("ERROR:  " + data);
+                        console.log(data);
+                        console.log(page+controller + JSON.stringify({sentence: sentence, ruleString: ruleString}));
+
+                    }
+                });
+            }
+
+            function annotateArguments(inputPrem,inputConcl,inputRelation,resultContainer) {
+                var controller = "/annotate_argument"
+                var premise = document.getElementById(inputPrem).value;
+                var conclusion = document.getElementById(inputConcl).value;
+                var relation = document.getElementById(inputRelation).value;
+                // document.getElementById(graphWindow).innerHTML = 'Now displaying graph for "' + sentence + '"';
+                console.log("Read in premise: " + premise);
+                console.log("Read in conclusion: " + conclusion);
+                console.log("Read in relation: " + relation);
+
+
+                $.ajax({
+                    url: page + controller,
+                    contentType: "application/json; charset=utf-8",
+                    type: 'POST',
+                    // async: false,
+                    cache: false,
+                    data: JSON.stringify({premise: premise, conclusion: conclusion, relation: relation}),
+                    success: function (data) {
+
+                        if (data.hasOwnProperty("liger_argument")) {
+                            console.log(data);
+                        }
+                    },
+                    error: function (data) {
+                        alert("ERROR:  " + data);
+                        console.log(data);
 
                     }
                 });
