@@ -99,7 +99,7 @@
         <textarea class="query" id="s6" name="sentence">#a POS VBZ</textarea>
         <br>
         <input type="submit" value="Submit"
-               onclick="querySentence('/annotate_gkr','s6','s5','sem4')">
+               onclick="querySentence('/query','s6','s5','sem4')">
 
         <sem id="sem4"></sem>
 
@@ -335,7 +335,7 @@
                         createGraph(input, graph_container);
 
                         if (input.hasOwnProperty("semantics") && sem_container != null) {
-                            createSemantics(input.semantics, sem_container);
+                            writeToContainer(input.semantics, sem_container);
                         }
 
                     },
@@ -368,7 +368,7 @@
                         createGraph(data, graphContainer);
 
                         if (data.hasOwnProperty("semantics") && semContainer != null) {
-                            createSemantics(data.semantics, semContainer);
+                            writeToContainer(data.semantics, semContainer);
                         }
 
 
@@ -392,7 +392,7 @@
                 var result;
 
                 $.ajax({
-                    url: "https://public.gkr.services.lingvis.io/gkr/sentence",
+                    url: "http://localhost:8080/annotate_gkr",
                     contentType: "application/json; charset=utf-8",
                     type: 'POST',
                     // async: false,
@@ -437,43 +437,7 @@
                         }
 
                         if (data.hasOwnProperty("success") && resultContainer != null) {
-                            createSemantics(data.success, resultContainer);
-                        }
-
-
-                    },
-                    error: function (data) {
-                        alert("ERROR:  " + data);
-                        console.log(data);
-                        console.log(page+controller + JSON.stringify({sentence: sentence, ruleString: ruleString}));
-
-                    }
-                });
-            }
-
-            function sentence2akr(controller, inputId, sentenceWindow, resultContainer) {
-                var sentence = document.getElementById(sentenceWindow).value;
-                var ruleString = document.getElementById(inputId).value;
-                // document.getElementById(graphWindow).innerHTML = 'Now displaying graph for "' + sentence + '"';
-                console.log("Read in sentence:" + sentence)
-                console.log("Read in query:" + ruleString)
-
-
-                $.ajax({
-                    url: page + controller,
-                    contentType: "application/json; charset=utf-8",
-                    type: 'POST',
-                    // async: false,
-                    cache: false,
-                    data: JSON.stringify({sentence: sentence, ruleString: ruleString}),
-                    success: function (data) {
-
-                        if (data.hasOwnProperty("success")) {
-                            console.log(data.success);
-                        }
-
-                        if (data.hasOwnProperty("success") && resultContainer != null) {
-                            createSemantics(data.success, resultContainer);
+                            writeToContainer(data.success, resultContainer);
                         }
 
 
@@ -508,7 +472,9 @@
                     success: function (data) {
 
                         if (data.hasOwnProperty("liger_argument")) {
+                            console.log('success')
                             console.log(data);
+                            writeToContainer(JSON.stringify(data), resultContainer);
                         }
                     },
                     error: function (data) {
@@ -520,7 +486,7 @@
             }
 
 
-            function createSemantics(semantics, container) {
+            function writeToContainer(semantics, container) {
                 var container = document.getElementById(container);
                 container.innerHTML = semantics;
             }
