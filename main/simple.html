@@ -104,17 +104,26 @@
         <sem id="sem4"></sem>
 
 
+        <h2 id="querying2">Querying multiple: </h2>
+
+
+
+        <input type="submit" value="Submit"
+               onclick="queryArgList('sem45')">
+
+        <argument id="sem45"></argument>
+
         <h2 id="annotate_args">Argument annotation: </h2>
 
 
         <form action="#" onsubmit="return false;" id="demo_form10">
             <label>Premise:</label><br>
-            <input type="text" id="s101" name="sentence" value="Covid has a 2% mortality rate."><br>
+            <input type="text" id="s101" name="sentence" value="Researchers believe that Covid has a high mortality rate."><br>
         </form>
 
         <form action="#" onsubmit="return false;" id="demo_form11">
             <label>Conclusion:</label><br>
-            <input type="text" id="s102" name="sentence" value="Covid is dangerous."><br>
+            <input type="text" id="s102" name="sentence" value="Allegedly, Covid is dangerous."><br>
         </form>
 
         <form action="#" onsubmit="return false;" id="demo_form12">
@@ -450,6 +459,57 @@
                     }
                 });
             }
+
+
+            function queryArgList(resultContainer) {
+                var controller = "/query_args";
+
+                var premise1 = "This is a first premise.";
+                var conclusion1 = "This is a conclusion.";
+                var id1 = "arg1";
+                var arg1Json = {premise: premise1, conclusion: conclusion1, relation: "support"}
+
+                var premise2 = "This was a second premise.";
+                var conclusion2 = "This was a conclusion.";
+                var id2 = "arg2";
+                var arg2Json = {premise: premise2, conclusion: conclusion2, relation: "support"}
+
+
+                var premise3 = "This is a third premise.";
+                var conclusion3 = "This is a conclusion.";
+                var id3 = "arg3";
+                var arg3Json = {premise: premise3, conclusion: conclusion3, relation: "support"}
+
+                var query = "#a POS VBZ"
+
+                var id2argMap = {id1: arg1Json, id2: arg2Json, id3: arg3Json}
+
+                var dataInput = JSON.stringify({mpg_arguments:id2argMap, query: query})
+
+
+
+                console.log(dataInput);
+
+                $.ajax({
+                    url: page + controller,
+                    contentType: "application/json; charset=utf-8",
+                    type: 'POST',
+                    // async: false,
+                    cache: false,
+                    data: dataInput,
+                    success: function (data) {
+                            writeToContainer(JSON.stringify(data,undefined,2), resultContainer);
+                        }
+                    ,
+                    error: function (data) {
+                        alert("ERROR:  " + data);
+                        console.log(data);
+
+                    }
+                });
+            }
+
+
 
             function annotateArguments(inputPrem,inputConcl,inputRelation,resultContainer) {
                 var controller = "/annotate_argument"
