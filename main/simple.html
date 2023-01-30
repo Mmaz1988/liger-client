@@ -129,7 +129,7 @@
         <input type="submit" value="Submit"
                onclick="annotateArguments('s101','s102','relation' ,'res101')">
 
-        <sem id="res101"></sem>
+        <argument id="res101"></argument>
 
 
 
@@ -474,7 +474,7 @@
                         if (data.hasOwnProperty("liger_argument")) {
                             console.log('success')
                             console.log(data);
-                            writeToContainer(JSON.stringify(data), resultContainer);
+                            writeToContainer(JSON.stringify(data,undefined,2), resultContainer);
                         }
                     },
                     error: function (data) {
@@ -488,7 +488,7 @@
 
             function writeToContainer(semantics, container) {
                 var container = document.getElementById(container);
-                container.innerHTML = semantics;
+                container.innerHTML = "<pre>"+semantics +"</pre>";
             }
 
             //Makes a request to server to process input sentence. server returns a graph in json form
