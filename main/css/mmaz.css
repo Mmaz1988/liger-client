@@ -240,3 +240,31 @@ img {
     border-color : #00a9e0;
       }
 
+.tab {
+	overflow: hidden;
+	background-color: #00a9e0;
+}
+
+/* Style for tab links */
+.tab button {
+	background-color: inherit;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 14px 16px;
+	transition: 0.3s;
+	font-size: 17px;
+}
+
+/* Style for active tab link */
+.tab button.active {
+	background-color: #2eccff;
+}
+
+/* Style for tab content */
+.tabcontent {
+	display: none;
+	padding: 6px 12px;
+	border: 1px solid #00a9e0;
+	border-top: none;
+}

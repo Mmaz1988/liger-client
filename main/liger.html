@@ -25,42 +25,30 @@
         </a>
     </banner>
     <header>
-        <h1>Testpage of the Abstract Syntax Annotator </h1>
+        <h1>LiGER testpage </h1>
         <h2>
             Written by Mark-Matthias Zymla <br>
         </h2>
     </header>
 </top>
 <container>
-
     <nav>
-
         <ul>
             <li><a href="#abstract_syntax_annotator"> Introduction </a></li>
             <li><a href="#simple_demo"> Demo description </a></li>
             <li><a href="#demo_form"> The demo </a></li>
             <li><a href="#semantics_demo">Glue semantics</a></li>
         </ul>
-
-        <!--
-                <ul>
-                    <li><a href= "index.html"> Home </a> </li>
-                    <li><a href= "projects.html"> Projects </a> </li>
-                    <li><a href= "publications.html"> Research </a> </li>
-                    <li><a href= "teachings.html"> Teachings </a> </li>
-                </ul>
-        -->
-
     </nav>
 
     <article>
 
         <h1 id="abstract_syntax_annotator">
-            The Abstract Syntax Annotator
+            LiGER (Linguistic Graph Expansion and Rewriting)
         </h1>
 
         <p>
-            In line with much recent research on semantic annotation, the abstract syntax annotator is designed to
+            In line with much recent research on semantic annotation, LiGER is designed to
             add annotations to syntactic analyses of natural language expressions. In particular, the system focuses
             on analyses provided by two syntactic frameworks, namely, LFG (as implemented in the Xerox Lingustics
             Environment (XLE)), and Universal Dependencies (as implemented in the Stanford CoreNLP library).
@@ -70,7 +58,7 @@
             and allows the user to apply transfer rules (an expression coined by the XLE transfer system) to rewrite
             and expand on linguistic annotations. The system is inspired by the previously mentioned transfer component
             of the XLE, the packed rewrite system, which is, unfortunately not supported by XLE anymore.
-            The abstract syntactic annotator aims at picking up this legacy and provides a framework independent
+            LiGER aims at picking up this legacy and provides a framework independent
             rule system for expansion or rewriting of linguistic annotations.
         </p>
         <p>
@@ -84,178 +72,192 @@
         <p>
             This page provides a simple demo of the system with a visualization component to better explain the
             capabilities
-            of the system.
+            of the system, as well as some experimental examples for extended functionalities.
         </p>
 
-        <h2 id="querying">Querying: </h2>
+
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'general')" id="defaultOpen">General</button>
+            <button class="tablinks" onclick="openTab(event, 'argument_annotation')">Argument annotation</button>
+            <button class="tablinks" onclick="openTab(event, 'other_interfaces')">Other</button>
+        </div>
+
+        <div id="general" class="tabcontent">
+
+            <h2 id="querying">Querying: </h2>
 
 
-        <form action="#" onsubmit="return false;" id="demo_form4">
-            <label for="s2">Input sentence:</label><br>
-            <input type="text" id="s5" name="sentence" value="Every man loves a woman."><br>
-        </form>
+            <p>The rewrite system is based on a query language for directed graphs. The following demo parses a sentence
+            with a UD parser and then queries the resulting graph with the presented query.If the graph satisfies the query,
+                then the system returns true, else it returns false. </p>
 
-        <label for="s4">Input rule:</label><br>
-        <textarea class="query" id="s6" name="sentence">#a POS VBZ</textarea>
-        <br>
-        <input type="submit" value="Submit"
-               onclick="querySentence('/query','s6','s5','sem4')">
-
-        <sem id="sem4"></sem>
-
-
-        <h2 id="querying2">Querying multiple: </h2>
-
-
-
-        <input type="submit" value="Submit"
-               onclick="queryArgList('sem45')">
-
-        <argument id="sem45"></argument>
-
-        <h2 id="annotate_args">Argument annotation: </h2>
-
-
-        <form action="#" onsubmit="return false;" id="demo_form10">
-            <label>Premise:</label><br>
-            <input type="text" id="s101" name="sentence" value="Researchers believe that Covid has a high mortality rate."><br>
-        </form>
-
-        <form action="#" onsubmit="return false;" id="demo_form11">
-            <label>Conclusion:</label><br>
-            <input type="text" id="s102" name="sentence" value="Allegedly, Covid is dangerous."><br>
-        </form>
-
-        <form action="#" onsubmit="return false;" id="demo_form12">
-            <label for="relation">Test sentences:</label> <br>
-            <select name="relation" id='relation'>
-                <option value="support">support</option>
-                <option value="attack">attack</option>
-                <option value="rephrase">rephrase</option>
-            </select>
-        </form>
-
-        <input type="submit" value="Submit"
-               onclick="annotateArguments('s101','s102','relation' ,'res101')">
-
-        <argument id="res101"></argument>
-
-
-
-        <h2 id="simple_demo">
-            Simple Demo:
-        </h2>
-
-        <p>The simple demo adds abstract tense and aspect information to a universal dependency graph. More concretely,
-            it aggregates syntactic features into semantically interpretable features. It abstracts away from complex
-            syntactic structures
-            to a simple attribute/value matrix for tense and aspect. For this purpose it uses the rules listed in
-            <a href="test_files/testRulesUD4.txt" target="_blank">TAM-conversion rules</a>. The final result of this
-            conversion is given
-            in the TAM node. These test rules follow, to some extent, the best practices of encoding tense and aspect in
-            XLE
-            in accordance with the <a href="https://pargram.w.uib.no/" target="_blank">ParGram project</a>, providing
-            a flat analysis of complex auxiliary constructions (e.g. English perfect, and progressive).</p>
-        <ul class="a">
-            <li>Light blue circles describe the initial syntactic analysis (a UD dependency parse)</li>
-            <li>Red circles describe the added annotation</li>
-        </ul>
-
-        <form action="#" onsubmit="return false;" id="demo_form">
-            <label for="s1">Input sentence:</label><br>
-            <input type="text" id="s1" name="sentence" value="John loves Mary."><br>
-            <input type="submit" value="Submit" onclick="process_sentence('/annotate','s1','graph_window1','cy')">
-        </form>
-
-        <h3 id="graph_window1">
-            Graph should appear below here:
-        </h3>
-        <cy id='cy'></cy>
-
-
-        <h2 id="semantics_demo">
-            Glue semantics integration demo
-        </h2>
-
-        <p>
-            In addition to adding relational and attribute/value information, the abstract syntax annotator also allows
-            users
-            to design rules that produce semantic representations. More concretely, the system allows users to add
-            meaning
-            constructors, semantic representations used in Glue semantics. Rules for semantic interpretation initialize
-            a set
-            of nodes the indices of which serve the generation of linear logic formulas.
-        </p>
-        <p>
-            The system uses the rules in
-            <a href="test_files/testRulesUD1.txt" target="_blank">semantic interpretation rules</a> to produce meaning
-            constructors. These rules make use of the fact, that variables on the left hand side can be instantiated to
-            concrete values on the right side of a rule (If multiple instantiations are possible, all instantiations are
-            produced, but are mapped to different readings of the sentence).
-        </p>
-
-        <form action="#" onsubmit="return false;" id="demo_form2">
-            <label for="s2">Input sentence:</label><br>
-            <input type="text" id="s2" name="sentence" value="Every man loves a woman."><br>
-            <input type="submit" value="Submit"
-                   onclick="process_sentence('/semantics','s2','graph_window2','cy2','sem1')">
-        </form>
-
-        <h3 id="graph_window2">
-            Graph should appear below here:
-        </h3>
-
-        <cy id='cy2'></cy>
-        <sem id="sem1"></sem>
-
-
-        <h2 id="rules_demo">
-            How to write rules
-        </h2>
-
-        <form action="#" onsubmit="return false;" id="demo_form3">
-            <label for="test_sent">Test sentences:</label> <br>
-            <select name="test_sent" id='test_sent'>
-                <option value="John loves Mary.">John loves Mary.</option>
-                <option value="Every man loves a woman.">Every man loves a woman.</option>
-                <option value="Mary has visited her mother.">Mary has visited her mother.</option>
-                <option value="John said that Mary was sick.">John said that Mary was sick.</option>
-            </select>
-            <br>
-            <input type="submit" value="Submit"
-                   onclick="process_sentence('/parse','test_sent','graph_window3','cy3')">
-            <br>
+            <form action="#" onsubmit="return false;" id="demo_form4">
+                <label for="s2">Input sentence:</label><br>
+                <input type="text" id="s5" name="sentence" value="Every man loves a woman."><br>
+            </form>
 
             <label for="s4">Input rule:</label><br>
-            <textarea class="rule" id="s4" name="sentence">#a POS VBZ & #a TOKEN %a ==> #a MORPH #b & #b FIN '+' & #b TENSE 'pres' & #b HEAD %a.</textarea>
+            <textarea class="query" id="s6" name="sentence">#a POS VBZ</textarea>
             <br>
             <input type="submit" value="Submit"
-                   onclick="annotateSentence('/apply_rule','s4','test_sent','graph_window3','cy3','sem2')">
+                   onclick="querySentence('/query','s6','s5','sem4')">
 
-        </form>
-
-
-        <h3 id="graph_window3">
-            Graph should appear below here:
-        </h3>
-
-        <cy id='cy3'></cy>
-        <sem id="sem2"></sem>
+            <sem id="sem4"></sem>
 
 
-        <h1>
-            GKR interface
-        </h1>
+            <h2 id="simple_demo">
+                Simple Demo:
+            </h2>
 
-        <label for="s4">Input sentence:</label><br>
-        <textarea class="rule" id="s7" name="sentence">Peter doubts that Mary loves Jordan.</textarea>
-        <br>
+            <p>The simple demo adds abstract tense and aspect information to a universal dependency graph. More concretely,
+                it aggregates syntactic features into semantically interpretable features. It abstracts away from complex
+                syntactic structures
+                to a simple attribute/value matrix for tense and aspect. For this purpose it uses the rules listed in
+                <a href="test_files/testRulesUD4.txt" target="_blank">TAM-conversion rules</a>. The final result of this
+                conversion is given
+                in the TAM node. These test rules follow, to some extent, the best practices of encoding tense and aspect in
+                XLE
+                in accordance with the <a href="https://pargram.w.uib.no/" target="_blank">ParGram project</a>, providing
+                a flat analysis of complex auxiliary constructions (e.g. English perfect, and progressive).</p>
+            <ul class="a">
+                <li>Light blue circles describe the initial syntactic analysis (a UD dependency parse)</li>
+                <li>Red circles describe the added annotation</li>
+            </ul>
 
-        <label for="s4">Input context:</label><br>
-        <textarea class="rule" id="s8">""</textarea>
-        <br>
-        <input type="submit" value="Submit"
-               onclick="annotateGKRSentence('s7','s8')">
+            <form action="#" onsubmit="return false;" id="demo_form">
+                <label for="s1">Input sentence:</label><br>
+                <input type="text" id="s1" name="sentence" value="John loves Mary."><br>
+                <input type="submit" value="Submit" onclick="process_sentence('/annotate','s1','graph_window1','cy')">
+            </form>
+
+            <h3 id="graph_window1">
+                Graph should appear below here:
+            </h3>
+            <cy id='cy'></cy>
+
+            <h2 id="semantics_demo">
+                Glue semantics integration demo
+            </h2>
+
+            <p>
+                In addition to adding relational and attribute/value information, the abstract syntax annotator also allows
+                users
+                to design rules that produce semantic representations. More concretely, the system allows users to add
+                meaning
+                constructors, semantic representations used in Glue semantics. Rules for semantic interpretation initialize
+                a set
+                of nodes the indices of which serve the generation of linear logic formulas.
+            </p>
+            <p>
+                The system uses the rules in
+                <a href="test_files/testRulesUD1.txt" target="_blank">semantic interpretation rules</a> to produce meaning
+                constructors. These rules make use of the fact, that variables on the left hand side can be instantiated to
+                concrete values on the right side of a rule (If multiple instantiations are possible, all instantiations are
+                produced, but are mapped to different readings of the sentence).
+            </p>
+
+            <form action="#" onsubmit="return false;" id="demo_form2">
+                <label for="s2">Input sentence:</label><br>
+                <input type="text" id="s2" name="sentence" value="Every man loves a woman."><br>
+                <input type="submit" value="Submit"
+                       onclick="process_sentence('/semantics','s2','graph_window2','cy2','sem1')">
+            </form>
+
+            <h3 id="graph_window2">
+                Graph should appear below here:
+            </h3>
+
+            <cy id='cy2'></cy>
+            <sem id="sem1"></sem>
+
+            <h2 id="rules_demo">
+                How to write rules
+            </h2>
+
+            <form action="#" onsubmit="return false;" id="demo_form3">
+                <label for="test_sent">Test sentences:</label> <br>
+                <select name="test_sent" id='test_sent'>
+                    <option value="John loves Mary.">John loves Mary.</option>
+                    <option value="Every man loves a woman.">Every man loves a woman.</option>
+                    <option value="Mary has visited her mother.">Mary has visited her mother.</option>
+                    <option value="John said that Mary was sick.">John said that Mary was sick.</option>
+                </select>
+                <br>
+                <input type="submit" value="Submit"
+                       onclick="process_sentence('/parse','test_sent','graph_window3','cy3')">
+                <br>
+
+                <label for="s4">Input rule:</label><br>
+                <textarea class="rule" id="s4" name="sentence">#a POS VBZ & #a TOKEN %a ==> #a MORPH #b & #b FIN '+' & #b TENSE 'pres' & #b HEAD %a.</textarea>
+                <br>
+                <input type="submit" value="Submit"
+                       onclick="annotateSentence('/apply_rule','s4','test_sent','graph_window3','cy3')">
+
+            </form>
+
+
+            <h3 id="graph_window3">
+                Graph should appear below here:
+            </h3>
+
+            <cy id='cy3'></cy>
+
+
+        </div>
+
+
+        <div id="argument_annotation" class="tabcontent">
+
+            <h2 id="annotate_args">Argument annotation: </h2>
+            <form action="#" onsubmit="return false;" id="demo_form10">
+                <label>Premise:</label><br>
+                <input type="text" id="s101" name="sentence" value="Researchers believe that Covid has a high mortality rate."><br>
+            </form>
+
+            <form action="#" onsubmit="return false;" id="demo_form11">
+                <label>Conclusion:</label><br>
+                <input type="text" id="s102" name="sentence" value="Allegedly, Covid is dangerous."><br>
+            </form>
+
+            <form action="#" onsubmit="return false;" id="demo_form12">
+                <label for="relation">Test sentences:</label> <br>
+                <select name="relation" id='relation'>
+                    <option value="support">support</option>
+                    <option value="attack">attack</option>
+                    <option value="rephrase">rephrase</option>
+                </select>
+            </form>
+
+            <input type="submit" value="Submit"
+                   onclick="annotateArguments('s101','s102','relation' ,'res101')">
+
+            <argument id="res101"></argument>
+
+            <h2 id="querying2">Querying multiple arguments: </h2>
+
+            <input type="submit" value="Submit"
+                   onclick="queryArgList('sem45')">
+
+            <argument id="sem45"></argument>
+        </div>
+
+
+        <div id="other_interfaces" class="tabcontent">
+
+            <h1>
+                GKR interface
+            </h1>
+            <label for="s4">Input sentence:</label><br>
+            <textarea class="rule" id="s7" name="sentence">Peter doubts that Mary loves Jordan.</textarea>
+            <br>
+
+            <label for="s4">Input context:</label><br>
+            <textarea class="rule" id="s8">""</textarea>
+            <br>
+            <input type="submit" value="Submit"
+                   onclick="annotateGKRSentence('s7','s8')">
+        </div>
+
 
 
 
@@ -288,7 +290,8 @@
 
         <script>
             //Address of the controller on server side
-            var page = "http://localhost:8080"
+
+
             //   var input = "";
 
             //To add tool tips to elements (used to add avps to graphs)
@@ -316,6 +319,8 @@
                 });
             }
 
+            var page = "https://staging.liger.sperrle.dbvis.de"
+           // var page = "http://localhost:8080";
 
             //Reads in sentence and formats it for a request to server
             function process_sentence(controller, input_id, graph_window, graph_container, sem_container) {
@@ -327,7 +332,7 @@
                 console.log("Generated parameter: " + params);
 
                 var url = page + controller + formatParams(params);
-                console.log("Make get request to: " + url);
+                console.log("Make post request to: " + url);
 
                 //Does the method need a callback to use this?
                 $.ajax({
@@ -401,7 +406,8 @@
                 var result;
 
                 $.ajax({
-                    url: "http://localhost:8080/annotate_gkr",
+                   // url: "https://liger.sperrle.dbvis.de/annotate_gkr",
+                     url: "http://localhost:8080/annotate_gkr",
                     contentType: "application/json; charset=utf-8",
                     type: 'POST',
                     // async: false,
@@ -462,31 +468,29 @@
 
 
             function queryArgList(resultContainer) {
-                var controller = "/query_args";
+                const controller = "/query_args";
 
-                var premise1 = "This is a first premise.";
-                var conclusion1 = "This is a conclusion.";
-                var id1 = "arg1";
-                var arg1Json = {premise: premise1, conclusion: conclusion1, relation: "support"}
+                const premise1 = "This is a first premise.";
+                const conclusion1 = "This is a conclusion.";
+                const id1 = "arg1";
+                const arg1Json = {premise: premise1, conclusion: conclusion1, relation: "support"};
 
-                var premise2 = "This was a second premise.";
-                var conclusion2 = "This was a conclusion.";
-                var id2 = "arg2";
-                var arg2Json = {premise: premise2, conclusion: conclusion2, relation: "support"}
-
-
-                var premise3 = "This is a third premise.";
-                var conclusion3 = "This is a conclusion.";
-                var id3 = "arg3";
-                var arg3Json = {premise: premise3, conclusion: conclusion3, relation: "support"}
-
-                var query = "#a POS VBZ"
-
-                var id2argMap = {id1: arg1Json, id2: arg2Json, id3: arg3Json}
-
-                var dataInput = JSON.stringify({mpg_arguments:id2argMap, query: query})
+                const premise2 = "This was a second premise.";
+                const conclusion2 = "This was a conclusion.";
+                const arg_id2 = "arg2";
+                const arg2Json = {premise: premise2, conclusion: conclusion2, relation: "support"};
 
 
+                const premise3 = "This is a third premise.";
+                const conclusion3 = "This is a conclusion.";
+                const id3 = "arg3";
+                const arg3Json = {premise: premise3, conclusion: conclusion3, relation: "support"};
+
+                const query = "#a POS VBZ";
+
+                const id2argMap = {id1: arg1Json, arg_id2: arg2Json, id3: arg3Json}
+
+                const dataInput = JSON.stringify({mpg_arguments: id2argMap, query: query});
 
                 console.log(dataInput);
 
@@ -682,6 +686,31 @@
                     })
                     .join("&")
             }
+
+            function openTab(evt, tabName) {
+                var i, tabcontent, tablinks;
+
+                // Hide all tab content
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+
+                // Deactivate all tab links
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+
+                // Show the selected tab content
+                document.getElementById(tabName).style.display = "block";
+
+                // Activate the selected tab link
+                evt.currentTarget.className += " active";
+            }
+
+            // Set the default tab to be open
+            document.getElementById("defaultOpen").click();
 
             //Container for displaying the graph produced by callREST()
         </script>
