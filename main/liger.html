@@ -6,7 +6,11 @@
     <link rel="stylesheet" href="css/mmaz.css">
     <link rel="stylesheet" href="css/opensans.css">
 
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css">
+
+    <link rel="stylesheet" href="css/liger_mode.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/theme/monokai.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
 
@@ -20,6 +24,7 @@
     <script src="https://unpkg.com/popper.js@1.14.7/dist/umd/popper.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-popper@1.0.4/cytoscape-popper.min.js"></script>
     <script src="https://unpkg.com/tippy.js@4.0.1/umd/index.all.min.js"></script>
+    <script src ="https://codemirror.net/5/addon/mode/simple.js"></script>
 </head>
 
 <top>
@@ -181,24 +186,22 @@
 
             <form action="#" onsubmit="return false;" id="demo_form3">
                 <label for="test_sent">Test sentences:</label> <br>
-                <select name="test_sent" id='test_sent'>
-                    <option value="John loves Mary.">John loves Mary.</option>
-                    <option value="Every man loves a woman.">Every man loves a woman.</option>
-                    <option value="Mary has visited her mother.">Mary has visited her mother.</option>
-                    <option value="John said that Mary was sick.">John said that Mary was sick.</option>
-                </select>
+                <input type="text" name="test_sent" id='test_sent' value="Jordan has visited her mother.">
+                </input>
+            </form>
                 <br>
                 <input type="submit" value="Submit"
                        onclick="process_sentence('/parse','test_sent','graph_window3','cy3')">
                 <br>
 
                 <label for="s4">Input rule:</label><br>
-                <input class="rule" id="s4" name="sentence" oninput="highlightText()">#a POS VBZ & #a TOKEN %a ==> #a MORPH #b & #b FIN '+' & #b TENSE 'pres' & #b HEAD %a.</input>
-                <br>
-                <input type="submit" value="Submit"
-                       onclick="annotateSentence('/apply_rule','s4','test_sent','graph_window3','cy3')">
+                <editor>
+                <textarea class="rule" id="s4" name="sentence"></textarea>
+                </editor>
+            <br>
+            <input type="submit" value="Submit"
+                   onclick="annotateFromEditor(rule_editor,'test_sent','graph_window3','cy3')">
 
-            </form>
 
 
             <h3 id="graph_window3">
@@ -297,47 +300,9 @@
             //Address of the controller on server side
 
 
-            function highlightText() {
-                var textField = document.getElementById("s4");
-                var text = textField.value;
-                var highlightedText = text.replace(/==>/g, '<span class="highlight">==></span>');
-                textField.value = highlightedText;
-            }
 
 
 
-
-                var editor = CodeMirror.fromTextArea(document.getElementById("s4"), {
-                lineNumbers: true,
-                mode: "liger"
-            });
-
-            Codemirror.defineMode("liger", function() {
-                var arrowToken = {
-                    regex: /==>/,
-                    token: "arrow"
-                };
-
-                var myRules = {
-                    arrow: {"color": "red"}
-                };
-
-                return {
-                    token: function(stream,state) {
-                        if (stream.match(arrowToken.regex)) {
-                            return arrowToken.token;
-                        }
-                    },
-                    startState: function(){},
-                    indent: function(state, textAfter){},
-                    electricInput: /^\s*[}\]]\s*$/,
-                    lineComment: "//",
-                    fold: "brace",
-                    modeProps: { fold: ["brace"]},
-                    myRules: myRules
-                };
-
-            });
 
 
             //   var input = "";
@@ -409,6 +374,9 @@
             }
 
             function annotateSentence(controller, inputId, sentenceWindow, graphWindow, graphContainer, semContainer) {
+
+                editor.save();
+
                 var sentence = document.getElementById(sentenceWindow).value;
                 var ruleString = document.getElementById(inputId).value;
                 document.getElementById(graphWindow).innerHTML = 'Now displaying graph for "' + sentence + '"';
@@ -442,6 +410,48 @@
                     }
                 });
             }
+
+
+            function annotateFromEditor(editor, sentenceWindow, graphWindow, graphContainer, semContainer) {
+
+                editor.save();
+
+                var sentence = document.getElementById(sentenceWindow).value;
+                var ruleString = editor.getValue();
+                document.getElementById(graphWindow).innerHTML = 'Now displaying graph for "' + sentence + '"';
+                console.log("Read in sentence:" + sentence)
+
+
+                $.ajax({
+                    url: page + "/apply_rule",
+                    contentType: "application/json; charset=utf-8",
+                    type: 'POST',
+                    // async: false,
+                    cache: false,
+                    data: JSON.stringify({sentence: sentence, ruleString: ruleString}),
+                    success: function (data) {
+
+                        if (data.hasOwnProperty("graphElements")) {
+                            console.log(data.graphElements);
+                        }
+                        createGraph(data, graphContainer);
+
+                        if (data.hasOwnProperty("semantics") && semContainer != null) {
+                            writeToContainer(data.semantics, semContainer);
+                        }
+
+
+                    },
+                    error: function (data) {
+                        alert("ERROR:  " + data);
+                        console.log(data);
+
+                    }
+                });
+            }
+
+
+
 
             function annotateGKRSentence(sentenceID, contextID)
             {
@@ -764,6 +774,55 @@
         </script>
     </article>
 </container>
+
+<script>
+
+
+
+
+    CodeMirror.defineMode("liger", function() {
+        return {
+            token: function(stream,state) {
+                if (stream.match("==>") ) {
+                    return "rule_separator";
+                }
+
+                else if (stream.match(/#[A-Za-z0-9]+/))
+                {
+                    return "liger_node_var";
+                }
+
+                else if (stream.match(/%[A-Za-z0-9]+/)) {
+                    return "liger_val_var";
+                }
+                else if (stream.match(/(\&|\.)/)) {
+
+                    return "liger_conjunction";
+                } else if (stream.match("//")) {
+                    stream.skipToEnd();
+                    return "comment"; // Use the "comment" CSS class for the comment token
+                }
+                else {
+                    stream.next();
+                    return null;
+                }
+            }
+
+        };
+    });
+
+
+    var rule_editor = CodeMirror.fromTextArea(document.getElementById("s4"), {
+        mode: "liger"
+    });
+    rule_editor.getDoc().setValue("#a POS VBZ & #a TOKEN %a ==> #a MORPH #b & #b FIN '+' & #b TENSE 'pres' & #b HEAD %a." );
+
+
+
+
+
+</script>
+
 </html>
 <!--
     //  var sentence = prompt("Enter a sentence");

@@ -50,6 +50,16 @@ cy {
 }
 
 
+editor {
+	width: 800px;
+	display: block;
+	border-style: solid;
+	border-color: #00a9e0;
+	margin: 5px;
+	overflow: auto;
+}
+
+
 sem {
 	white-space: pre-wrap;
 	font-family: Open Sans;
