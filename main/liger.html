@@ -207,9 +207,8 @@
                 <div style="flex: 1;">
             <form action="#" onsubmit="return false;" id="demo_form3">
                 <label for="test_sent">Test sentence:</label> <br>
-                <input type="text" style="width: 750px;" name="test_sent" id='test_sent' value="Jordan has visited her mother.">
-                </input>
-            </form>
+                <input type="text" style="width: 750px;" name="test_sent" id='test_sent' value="Every man loves a woman.">
+              </form>
                 <br>
                 <input type="submit" value="Parse input sentence"
                        onclick="process_sentence('/parse','test_sent','graph_window3','cy3')">
@@ -221,7 +220,7 @@
                 </editor>
             <br>
             <input type="submit" value="Apply rules"
-                   onclick="annotateFromEditor(rule_editor,'test_sent','graph_window3','cy3')">
+                   onclick="annotateFromEditor(rule_editor,'test_sent','graph_window3','cy3','sem5', 'glueEditor')">
                     <br>
 
                     <ul id="rule_list"  style="width: 800px; border: 2px solid #00a9e0; margin: 5px;">
@@ -235,6 +234,13 @@
             </h3>
 
             <cy id='cy3'></cy>
+
+                <sem id="sem5"></sem>
+
+                <editor>
+                    <textarea class="rule" id="glueEditor" name="sentence"></textarea>
+                </editor>
+
             </div>
             </div>
         </div>
@@ -438,7 +444,7 @@
             }
 
 
-            function annotateFromEditor(editor, sentenceWindow, graphWindow, graphContainer, semContainer) {
+            function annotateFromEditor(editor, sentenceWindow, graphWindow, graphContainer, semContainer, editContainer) {
 
 
                 document.getElementById("rule_list").innerHTML = "";
@@ -482,11 +488,10 @@
                                 const graphID = "'" + graphWindow + "'";
                                 const gcID =  "'" + graphContainer + "'";
                                 const semID = "'" + semContainer + "'";
-                                const ruleText = "'" + data.appliedRules[i] + "'";
-
+                                const editID = "'" + editContainer+ "'";
 
                                 const onclickFunction = 'annotateFromAppliedRules(' + ligerID + ',' + sentID + ',' + graphID + ',' +
-                                    gcID + ',' + semID + ')';
+                                    gcID + ',' + semID + ',' + editID + ')';
 
                                 console.log(onclickFunction);
 
@@ -509,7 +514,7 @@
                                     '<div id=' + 'lrdiv' + i +
                                     ' style="flex: 0 auto;"' +
                                     '>' +
-                                    data.appliedRules[i] +
+                                     htmlEscape(data.appliedRules[i]) +
                                     '</div>' +
                                     '</div>' +
                                     '</li>');
@@ -520,7 +525,10 @@
                             writeToContainer(data.graph.semantics, semContainer);
                         }
 
-
+                        if (data.hasOwnProperty("meaningConstructors") && editContainer != null)
+                        {
+                                glue_editor.getDoc().setValue(data.meaningConstructors);
+                        }
 
                     },
                     error: function (data) {
@@ -531,7 +539,18 @@
                 });
             }
 
-            function annotateFromAppliedRules(ruleID, sentenceWindow, graphWindow, graphContainer, semContainer) {
+
+            function htmlEscape(text) {
+                // Replace all occurrences of "<" with "&lt;"
+                text = text.replace(/</g, "&lt;");
+                // Replace all occurrences of ">" with "&gt;"
+                text = text.replace(/>/g, "&gt;");
+                return text;
+            }
+
+
+
+            function annotateFromAppliedRules(ruleID, sentenceWindow, graphWindow, graphContainer, semContainer, editCont) {
 
                 console.log("successfully called annotateFromAppliedRules");
                 console.log(ruleID);
@@ -598,6 +617,10 @@
                         }
 
 
+                        if (data.hasOwnProperty("meaningConstructors") && editCont != null)
+                        {
+                            glue_editor.getDoc().setValue(data.meaningConstructors);
+                        }
 
                     },
                     error: function (data) {
@@ -972,98 +995,88 @@
         };
     });
 
+    CodeMirror.defineMode("glue", function() {
+        return {
+            token: function(stream,state) {
+                if (stream.match(":") ) {
+                    return "rule_separator";
+                }
+
+                else if (stream.match(/-o/))
+                {
+                    return "liger_node_var";
+                }
+
+                else if (stream.match(/(\[|\])/)) {
+                    return "liger_conjunction";
+
+                }
+                else if (stream.match(/(\(|\))/)) {
+                    return "liger_val_var";
+
+                }
+                else if (stream.match(/(<|>)/)) {
+                    return "angular_brackets";
+
+                }
+                else if (stream.match("//")) {
+                    stream.skipToEnd();
+                    return "comment"; // Use the "comment" CSS class for the comment token
+                }
+                else {
+                    stream.next();
+                    return null;
+                }
+            }
+
+        };
+    });
+
 
     var rule_editor = CodeMirror.fromTextArea(document.getElementById("s4"), {
         mode: "liger"
     });
 
-    var url = page + "/test_files/testRulesUD4b.txt";
+    var glue_editor = CodeMirror.fromTextArea(document.getElementById("glueEditor"), {
+        mode: "glue"
+    });
 
     var rules = "--replace(true);\n" +
         "\n" +
-        "//Finite forms\n" +
-        "#a POS VBZ & #a TOKEN %a ==> #a MORPH #b & #b FIN '+' & #b FORM 'pres' & #b HEAD %a.\n" +
-        "#a POS VBP & #a TOKEN %a ==> #a MORPH #b & #b FIN '+' & #b FORM 'pres' & #b HEAD %a.\n" +
-        "#a POS VBD & #a TOKEN %a ==> #a MORPH #b & #b FIN '+' & #b FORM 'past' & #b HEAD %a.\n" +
-        "#a POS MD & #a TOKEN %a ==> #a MORPH #b & #b FIN '+' & #b FORM 'lex(%a,tense)' & #b HEAD %a.\n" +
+        "#a POS VBZ ==> #a SEM #b & #b EV #c.\n" +
+        "#a POS VBD ==> #a SEM #b & #b EV #c.\n" +
         "\n" +
+        "#b SEM #c EV #d & #b LEMMA %b ==> #d GLUE [/e_v.%b(e)] :  (#d -o #c).\n" +
         "\n" +
-        "//Non-finite forms\n" +
-        "#a POS VBG & #a TOKEN %a ==> #a MORPH #b & #b FIN '-' & #b HEAD %a & #b FORM 'prpart'.\n" +
-        "#a POS VBN & #a TOKEN %a ==> #a MORPH #b & #b FIN '-' & #b HEAD %a & #b FORM 'ppart'.\n" +
-        "#a POS VB & #a TOKEN %a ==> #a MORPH #b & #b FIN '-' & #b HEAD %a & #b FORM 'inf'.\n" +
+        "//NPs\n" +
         "\n" +
-        "//Copu\n" +
-        "#a POS JJ & #a TOKEN %a & #a cop #b TOKEN %b &\n" +
-        "#b MORPH #c FIN %c & #c FORM %d ==> #a MORPH #c & #c HEAD %b %a & #c FIN %c & #c FORM %d.\n" +
+        "//proper names\n" +
+        "#a POS NNP & #a TOKEN %a ==> #a SEM #b & #b GLUE %a : #b.\n" +
         "\n" +
+        "//Setup for Quantifier\n" +
+        "#a ^(det) #b ==> #b SEM #c & #c VAR #d & #c RESTR #e.\n" +
         "\n" +
-        "//separate finite from non-finite verbs\n" +
-        "#a MORPH #b FIN '+' ==> #b AUX '-'.\n" +
+        "//predicative NP (scope of quantifier)\n" +
+        "#a SEM #b VAR #c & #b RESTR #d & #a TOKEN %a ==> #a GLUE [/x_e.%a(x)] : (#c -o #d).\n" +
         "\n" +
-        "#a FORM 'ppart' ==> #a ASPECT 'perf'.\n" +
-        "#a FORM 'prpart' ==> #a ASPECT 'prog'.\n" +
+        "#a ^(det) #b SEM #c VAR #d & #c RESTR #e &\n" +
+        "#a TOKEN %a & %a == a &\n" +
+        "#b ^(%) #f SEM #g\n" +
+        "==> #c GLUE [/P_<e,t>.[/Q_<e,t>.Ex_e[P(x) \\& Q(x)]]] : ((#d -o #e) -o ((#c -o #g) -o #g)).\n" +
         "\n" +
-        "#a aux #b & #b MORPH #c ASPECT %c & #a MORPH #d &\n" +
-        "#c HEAD %b & #d HEAD %d\n" +
-        "==> #c AUX '+' & #d ASP-AUX #c & #d MAIN '+' & #d HEAD %b %d.\n" +
+        "#a ^(det) #b SEM #c VAR #d & #c RESTR #e &\n" +
+        "#a TOKEN %a & %a == every &\n" +
+        "#b ^(%) #f SEM #g\n" +
+        "==> #c GLUE [/P_<e,t>.[/Q_<e,t>.Ax_e[P(x) -> Q(x)]]] : ((#d -o #e) -o ((#c -o #g) -o #g)).\n" +
         "\n" +
-        "#a cop #b & #b TOKEN %c & #b MORPH #c ASPECT %c &\n" +
-        "#c HEAD %b & #a TOKEN %a\n" +
-        "==> #c AUX '+' & #d ASP-AUX #c & #d MAIN '+' & #c HEAD %b %a.\n" +
+        "#a SEM #b EV #c &\n" +
+        "#a nsubj #d SEM #e &\n" +
+        "==> #b GLUE [/R_<v,t>.[/x_e.Ee_v[R(e) \\& agent(e,x)]]] : ((#c -o #b) -o (#e -o #b)).\n" +
         "\n" +
-        "//Fusing heads for aux verbs in the main verb (finite aux)\n" +
-        "#a aux #b & #b MORPH #c FORM 'inf' & #a MORPH #d &\n" +
-        "#c HEAD %b & #d HEAD %d\n" +
-        "==> #c AUX '+' & #d ASP-AUX #c & #d MAIN '+' & #d HEAD %b %d.\n" +
-        "\n" +
-        "#a aux:pass #b & #b MORPH #c FORM 'inf' & #a MORPH #d &\n" +
-        "#c HEAD %b & #d HEAD %d\n" +
-        "==> #c AUX '+' & #d ASP-AUX #c & #d MAIN '+' & #d HEAD %b %d.\n" +
-        "\n" +
-        "#a aux #b & #b MORPH #c FIN '+' & #c FORM %c & #a MORPH #d &\n" +
-        "#c HEAD %b & #d HEAD %d\n" +
-        "==> #c AUX '+' & #d AUX #c & #d MAIN '+' & #d FIN '+' & #d FORM %c & #d HEAD %b %d.\n" +
-        "\n" +
-        "//#a aux:pass #b & #a MORPH #c FIN '+' & #b MORPH #d &\n" +
-        "//#c HEAD %b & #d HEAD %d\n" +
-        "//==> #b AUX '+' & #c AUX #d & #c MAIN '+' & #c HEAD %d %b.\n" +
-        "\n" +
-        "//#a aux:pass #b & #a MORPH #c FIN '-' & #b MORPH #d &\n" +
-        "//#c HEAD %b & #d HEAD %d\n" +
-        "//==> #b AUX '+' & #c AUX #d & #c MAIN '+' & #c HEAD %d %b.\n" +
-        "\n" +
-        "#a aux:pass #b & #a MORPH #c & #b MORPH #d &\n" +
-        "#c HEAD %b & #d HEAD %d & #d FIN %a\n" +
-        "==> #d AUX '+' & #c AUX #d & #c MAIN '+' & #c FIN %a & #c HEAD %d %b.\n" +
-        "\n" +
-        "//#a aux #b & #b MORPH #c TENSE %c & #a MORPH #d FORM 'ppart' ==> #c AUX '+' & #d AUX #c & #d MAIN '+' & #d ASPECT 'perf' & #b ASPECT 'perf'.\n" +
-        "//#a aux #b & #b MORPH #c TENSE %c & #a MORPH #d FORM 'prpart' ==> #c AUX '+' & #d AUX #c & #d MAIN '+' & #d ASPECT 'prog'.\n" +
-        "\n" +
-        "#a LEMMA go & #a MORPH #b ASPECT 'prog' &\n" +
-        "#a aux #c MORPH #f FIN '+' & #f FORM %f &\n" +
-        "#a xcomp #d & #d MORPH #e &\n" +
-        "#b HEAD %b & #e HEAD %e\n" +
-        "==> #e AUX #b & #e FORM %f('fut') & #b MAIN '-' & #e FIN '+' & #b FIN '+' & #e MAIN '+' & #e HEAD %b to %e.\n" +
-        "\n" +
-        "//Simple tense\n" +
-        "#b FIN '+' & #b FORM %b & #b HEAD %c & #b AUX '-' ==> #b TAM #d & #d HEAD '%c' & #d TENSE %b & #d FIN '+'.\n" +
-        "\n" +
-        "//Tense from aux verb\n" +
-        "#b MAIN '+' & #b AUX #c & #c FIN '+' & #b FORM %b &\n" +
-        "#c HEAD %d & #b HEAD %c ==> #c TAM #d & #b TAM #d & #d HEAD '%c' & #d TENSE %b & #d FIN '+'.\n" +
-        "\n" +
-        "//non-finite\n" +
-        "#a HEAD %a & #a FIN '-' & #a MAIN '+' ==> #a TAM #b & #b HEAD '%a'.\n" +
-        "\n" +
-        "//aspect\n" +
-        "#a HEAD %a & #a MAIN '+' & #a ASPECT %b & #a FIN '-' & #a TAM #b ==> #b ASPECT %b.\n" +
-        "\n" +
-        "//Aspect\n" +
-        "#a TAM #b & #a MAIN '+' & #a ASPECT %a & #a FIN '+' ==> #b ASPECT %a.\n" +
-        "#a TAM #b & #a MAIN '+' & #a ASPECT %a & #a ASP-AUX #c ASPECT %b ==> #b ASPECT '%b,%a'.\n" +
-        "\n" +
-        "\n";
+        "#a SEM #b EV #c &\n" +
+        "#a nsubj #d SEM #e &\n" +
+        "#a obj #f SEM #g\n" +
+        "==> #b GLUE [/R_<v,t>.[/x_e.[/y_e.Ee_v[R(e) \\& (agent(e,x) \\& theme(e,y))]]]] : ((#c -o #b) -o (#e -o (#g -o #b)))."
 
     /*
     fetch(url).then(response => response.text())

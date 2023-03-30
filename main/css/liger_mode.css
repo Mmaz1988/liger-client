@@ -15,5 +15,10 @@
 
 .cm-liger_conjunction
 {
-    color: #ff0000
+    color: #ff0000;
+}
+
+.cm-angular_brackets
+{
+    color: #d100ff;
 }
