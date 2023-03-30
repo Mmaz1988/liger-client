@@ -193,6 +193,8 @@
                 soon.
             </p>
 
+            <div style="display: flex; flex-wrap: wrap;">
+                <div style="flex: 1;">
             <form action="#" onsubmit="return false;" id="demo_form3">
                 <label for="test_sent">Test sentence:</label> <br>
                 <input type="text" style="width: 750px;" name="test_sent" id='test_sent' value="Jordan has visited her mother.">
@@ -210,16 +212,15 @@
             <br>
             <input type="submit" value="Submit"
                    onclick="annotateFromEditor(rule_editor,'test_sent','graph_window3','cy3')">
-
-
-
+                </div>
+            <div style="flex: 1;">
             <h3 id="graph_window3">
                 Graph should appear below here:
             </h3>
 
             <cy id='cy3'></cy>
-
-
+            </div>
+            </div>
         </div>
 
 
