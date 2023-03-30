@@ -189,7 +189,17 @@
                 The editor highlights variables of different kinds and certain functional elements such as the rule separator,
                 the conjunction, and the end-of-rule ".". The "submit" button below the input text provides a syntactic analysis
                 provided by the Stanford CoreNLP. The "submit" button below the rule editor is used to apply the rules in the editor
-                to the sentence entered above. This demo only allows for feature rewriting, not for semantic analysis. This feature will be added
+                to the sentence entered above.
+                </p>
+
+            <p>
+                After submitting the rules, the system displays those rules that apply to the current input in the order that they apply.
+                Each rule is accompanied by a "rule" button. Clicking this button allows the user to show how the graph has been rewritten at that
+                particular point. This functionality serves to debug rewrite rules.
+            </p>
+
+            <p>
+                This demo only allows for feature rewriting, not for semantic analysis. This feature will be added
                 soon.
             </p>
 
@@ -201,17 +211,23 @@
                 </input>
             </form>
                 <br>
-                <input type="submit" value="Submit"
+                <input type="submit" value="Parse input sentence"
                        onclick="process_sentence('/parse','test_sent','graph_window3','cy3')">
                 <br>
 
-                <label for="s4">Input rule:</label><br>
+                <label for="s4">Input rules:</label><br>
                 <editor>
                 <textarea class="rule" id="s4" name="sentence"></textarea>
                 </editor>
             <br>
-            <input type="submit" value="Submit"
+            <input type="submit" value="Apply rules"
                    onclick="annotateFromEditor(rule_editor,'test_sent','graph_window3','cy3')">
+                    <br>
+
+                    <ul id="rule_list"  style="width: 800px; border: 2px solid #00a9e0; margin: 5px;">
+
+                    </ul>
+
                 </div>
             <div style="flex: 1;">
             <h3 id="graph_window3">
@@ -424,7 +440,11 @@
 
             function annotateFromEditor(editor, sentenceWindow, graphWindow, graphContainer, semContainer) {
 
+
+                document.getElementById("rule_list").innerHTML = "";
                 editor.save();
+
+                console.log(graphContainer);
 
                 var sentence = document.getElementById(sentenceWindow).value;
                 var ruleString = editor.getValue();
@@ -441,14 +461,142 @@
                     data: JSON.stringify({sentence: sentence, ruleString: ruleString}),
                     success: function (data) {
 
-                        if (data.hasOwnProperty("graphElements")) {
-                            console.log(data.graphElements);
+                        if (data.hasOwnProperty("graph")) {
+                            if (data.graph.hasOwnProperty("graphElements")) {
+                                console.log(data.graph.graphElements);
+                            }
                         }
-                        createGraph(data, graphContainer);
+                        createGraph(data.graph, graphContainer);
 
-                        if (data.hasOwnProperty("semantics") && semContainer != null) {
-                            writeToContainer(data.semantics, semContainer);
+                        console.log(graphContainer);
+
+                        if (data.hasOwnProperty("appliedRules"))
+                        {
+                            var ruleList = document.getElementById("rule_list");
+
+                            for (let i = 0; i < data.appliedRules.length; i++)
+                            {
+                               // <button onClick="myFunction()">Click me</button>
+                                const ligerID = "'lr" + i + "'";
+                                const sentID = "'" + sentenceWindow + "'";
+                                const graphID = "'" + graphWindow + "'";
+                                const gcID =  "'" + graphContainer + "'";
+                                const semID = "'" + semContainer + "'";
+                                const ruleText = "'" + data.appliedRules[i] + "'";
+
+
+                                const onclickFunction = 'annotateFromAppliedRules(' + ligerID + ',' + sentID + ',' + graphID + ',' +
+                                    gcID + ',' + semID + ')';
+
+                                console.log(onclickFunction);
+
+                                const divContainerString = ' <div style="display: flex; flex-wrap: wrap; ' +
+                                                                         'column-gap: 20px; ' +
+                                                                         'padding: 5px;' +
+                                                                         'border: 2px solid #00a9e0;' +
+                                                                         'align-items: flex-start;">';
+                                const divString =  '<div style="flex: 0 auto;">';
+
+                                ruleList.innerHTML += ('<li>' +
+                                    divContainerString +
+                                    divString +
+                                    '<button onClick="' + onclickFunction + '"' +
+                                    ' id=' + ligerID +
+                                    'style="color: white; background-color: #00a9e0; border-color: white;"' +
+                                    '>' +
+                                    'Rule ' + i + ':' + '</button>' +
+                                    '</div>' +
+                                    '<div id=' + 'lrdiv' + i +
+                                    ' style="flex: 0 auto;"' +
+                                    '>' +
+                                    data.appliedRules[i] +
+                                    '</div>' +
+                                    '</div>' +
+                                    '</li>');
+                            }
                         }
+
+                        if (data.graph.hasOwnProperty("semantics") && semContainer != null) {
+                            writeToContainer(data.graph.semantics, semContainer);
+                        }
+
+
+
+                    },
+                    error: function (data) {
+                        alert("ERROR:  " + data);
+                        console.log(data);
+
+                    }
+                });
+            }
+
+            function annotateFromAppliedRules(ruleID, sentenceWindow, graphWindow, graphContainer, semContainer) {
+
+                console.log("successfully called annotateFromAppliedRules");
+                console.log(ruleID);
+                console.log(sentenceWindow);
+                console.log(graphWindow);
+                console.log(graphContainer);
+        //        console.log(semContainer);
+
+             //   document.getElementById("rule_list").innerHTML = "";
+             //   editor.save();
+
+                var sentence = document.getElementById(sentenceWindow).value;
+
+                var listPosition = ruleID.match(/\d+$/);
+
+                var ruleString = "--replace(true);\n";
+
+                for (let i = 0; i <= listPosition; i++)
+                {
+                    var listEntry = document.getElementById("lrdiv" + i);
+                    ruleString += listEntry.innerText + '\n';
+                }
+
+                console.log(ruleString);
+
+                document.getElementById(graphWindow).innerHTML = 'Now displaying graph for "' + sentence + '"';
+                console.log("Read in sentence:" + sentence)
+
+
+                $.ajax({
+                    url: page + "/apply_rule",
+                    contentType: "application/json; charset=utf-8",
+                    type: 'POST',
+                    // async: false,
+                    cache: false,
+                    data: JSON.stringify({sentence: sentence, ruleString: ruleString}),
+                    success: function (data) {
+
+                        if (data.hasOwnProperty("graph")) {
+                            if (data.graph.hasOwnProperty("graphElements")) {
+                                console.log(data.graph.graphElements);
+                            }
+                        }
+                        createGraph(data.graph, graphContainer);
+
+                        /*
+                        if (data.hasOwnProperty("appliedRules"))
+                        {
+                            var ruleList = document.getElementById("rule_list");
+
+                            for (let i = 0; i < data.appliedRules.length; i++)
+                            {
+                                // <button onClick="myFunction()">Click me</button>
+
+                                ruleList.innerHTML += ('<li>' + '<button onClick="" id="lr"' + i + '>' +
+                                    data.appliedRules[i] + '</button>' + '</li>');
+                            }
+                        }
+
+                         */
+
+                        if (data.graph.hasOwnProperty("semantics") && semContainer != null) {
+                            writeToContainer(data.graph.semantics, semContainer);
+                        }
+
 
 
                     },
@@ -626,6 +774,9 @@
             //Makes a request to server to process input sentence. server returns a graph in json form
             //The graph is embedded in a cytoscape graph visualization and displayed on the page.
             function createGraph(input, container) {
+
+                console.log(input);
+                console.log(container);
 
                 var cy = window[container] = cytoscape({
 
