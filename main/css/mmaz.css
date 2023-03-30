@@ -268,3 +268,7 @@ img {
 	border: 1px solid #00a9e0;
 	border-top: none;
 }
+
+.highlight {
+	color: red;
+}

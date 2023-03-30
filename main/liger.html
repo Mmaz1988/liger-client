@@ -5,6 +5,11 @@
 
     <link rel="stylesheet" href="css/mmaz.css">
     <link rel="stylesheet" href="css/opensans.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/theme/monokai.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
+
     <script
             src="https://code.jquery.com/jquery-3.6.0.js"
             integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
@@ -27,7 +32,7 @@
     <header>
         <h1>LiGER testpage </h1>
         <h2>
-            Written by Mark-Matthias Zymla <br>
+            Written by <a href="index.html" style="text-decoration:none;color:white;"> Mark-Matthias Zymla</a> <br>
         </h2>
     </header>
 </top>
@@ -188,7 +193,7 @@
                 <br>
 
                 <label for="s4">Input rule:</label><br>
-                <textarea class="rule" id="s4" name="sentence">#a POS VBZ & #a TOKEN %a ==> #a MORPH #b & #b FIN '+' & #b TENSE 'pres' & #b HEAD %a.</textarea>
+                <input class="rule" id="s4" name="sentence" oninput="highlightText()">#a POS VBZ & #a TOKEN %a ==> #a MORPH #b & #b FIN '+' & #b TENSE 'pres' & #b HEAD %a.</input>
                 <br>
                 <input type="submit" value="Submit"
                        onclick="annotateSentence('/apply_rule','s4','test_sent','graph_window3','cy3')">
@@ -241,7 +246,7 @@
             <argument id="sem45"></argument>
         </div>
 
-
+<!--
         <div id="other_interfaces" class="tabcontent">
 
             <h1>
@@ -257,7 +262,7 @@
             <input type="submit" value="Submit"
                    onclick="annotateGKRSentence('s7','s8')">
         </div>
-
+-->
 
 
 
@@ -292,6 +297,49 @@
             //Address of the controller on server side
 
 
+            function highlightText() {
+                var textField = document.getElementById("s4");
+                var text = textField.value;
+                var highlightedText = text.replace(/==>/g, '<span class="highlight">==></span>');
+                textField.value = highlightedText;
+            }
+
+
+
+
+                var editor = CodeMirror.fromTextArea(document.getElementById("s4"), {
+                lineNumbers: true,
+                mode: "liger"
+            });
+
+            Codemirror.defineMode("liger", function() {
+                var arrowToken = {
+                    regex: /==>/,
+                    token: "arrow"
+                };
+
+                var myRules = {
+                    arrow: {"color": "red"}
+                };
+
+                return {
+                    token: function(stream,state) {
+                        if (stream.match(arrowToken.regex)) {
+                            return arrowToken.token;
+                        }
+                    },
+                    startState: function(){},
+                    indent: function(state, textAfter){},
+                    electricInput: /^\s*[}\]]\s*$/,
+                    lineComment: "//",
+                    fold: "brace",
+                    modeProps: { fold: ["brace"]},
+                    myRules: myRules
+                };
+
+            });
+
+
             //   var input = "";
 
             //To add tool tips to elements (used to add avps to graphs)
@@ -319,8 +367,8 @@
                 });
             }
 
-            var page = "https://staging.liger.sperrle.dbvis.de"
-           // var page = "http://localhost:8080";
+           // var page = "https://staging.liger.sperrle.dbvis.de"
+            var page = "http://localhost:8080";
 
             //Reads in sentence and formats it for a request to server
             function process_sentence(controller, input_id, graph_window, graph_container, sem_container) {
