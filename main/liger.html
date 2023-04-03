@@ -25,7 +25,10 @@
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-popper@1.0.4/cytoscape-popper.min.js"></script>
     <script src="https://unpkg.com/tippy.js@4.0.1/umd/index.all.min.js"></script>
     <script src ="https://codemirror.net/5/addon/mode/simple.js"></script>
+    <script src = "https://codemirror.net/5/addon/edit/trailingspace.js"></script>
 </head>
+
+
 
 <top>
     <banner>
@@ -363,8 +366,8 @@
                 });
             }
 
-           // var page = "https://staging.liger.sperrle.dbvis.de"
-            var page = "http://localhost:8080";
+            var page = "https://staging.liger.sperrle.dbvis.de"
+           // var page = "http://localhost:8080";
 
             //Reads in sentence and formats it for a request to server
             function process_sentence(controller, input_id, graph_window, graph_container, sem_container) {
@@ -453,6 +456,7 @@
 
                 var sentence = document.getElementById(sentenceWindow).value;
                 var ruleString = editor.getValue();
+                console.log(ruleString);
                 document.getElementById(graphWindow).innerHTML = 'Now displaying graph for "' + sentence + '"';
                 console.log("Read in sentence:" + sentence)
 
@@ -969,19 +973,19 @@
                 if (stream.match("==>") ) {
                     return "rule_separator";
                 }
-
                 else if (stream.match(/#[A-Za-z0-9]+/))
                 {
                     return "liger_node_var";
                 }
-
                 else if (stream.match(/%[A-Za-z0-9]+/)) {
                     return "liger_val_var";
                 }
-                else if (stream.match(/(\&|\.)/)) {
-
+                else if (stream.match(/(\&|\.)/))
+                {
                     return "liger_conjunction";
-                } else if (stream.match("//")) {
+                }
+                else if (stream.match("//"))
+                {
                     stream.skipToEnd();
                     return "comment"; // Use the "comment" CSS class for the comment token
                 }
@@ -1033,7 +1037,8 @@
 
 
     var rule_editor = CodeMirror.fromTextArea(document.getElementById("s4"), {
-        mode: "liger"
+        mode: "liger",
+        showTrailingSpace: true
     });
 
     var glue_editor = CodeMirror.fromTextArea(document.getElementById("glueEditor"), {
