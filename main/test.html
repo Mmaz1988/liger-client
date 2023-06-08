@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GswbPreferences Form</title>
+</head>
+<body>
+<h2>GswbPreferences Form</h2>
+<form id="gswbPreferencesForm">
+  <label for="prover">Prover:</label>
+  <select id="prover" name="prover">
+    <option value="0">Hepple</option>
+    <option value="1">Lev</option>
+  </select>
+  <br><br>
+
+  <label for="outputstyle">Output Style:</label>
+  <select id="outputstyle" name="outputstyle">
+    <option value="0">Plain</option>
+    <option value="1">Prolog</option>
+    <option value="3">NLTK</option>
+  </select>
+  <br><br>
+
+  <label for="solutionOnly">Solution Only:</label>
+  <input type="checkbox" id="solutionOnly" name="solutionOnly">
+  <br><br>
+
+  <label for="debugging">Debugging:</label>
+  <input type="checkbox" id="debugging" name="debugging">
+  <br><br>
+
+  <label for="explainFail">Explain Fail:</label>
+  <input type="checkbox" id="explainFail" name="explainFail">
+  <br><br>
+
+  <input type="submit" value="Submit">
+</form>
+
+<script>
+  function getGswbPreferencesJSON() {
+    var prover = parseInt(document.getElementById("prover").value);
+    var outputstyle = parseInt(document.getElementById("outputstyle").value);
+    var solutionOnly = document.getElementById("solutionOnly").checked;
+    var debugging = document.getElementById("debugging").checked;
+    var explainFail = document.getElementById("explainFail").checked;
+
+    var jsonObject = {
+      "prover": prover,
+      "outputstyle": outputstyle,
+      "parseSem": false,
+      "noreduce": false,
+      "glueOnly": false,
+      "meaningOnly": false,
+      "solutionOnly": solutionOnly,
+      "debugging": debugging,
+      "explainFail": explainFail
+    };
+
+    return JSON.stringify(jsonObject);
+  }
+
+  document.getElementById("gswbPreferencesForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    var jsonString = getGswbPreferencesJSON();
+    console.log(jsonString);
+  });
+</script>
+</body>
+</html>
