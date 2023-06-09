@@ -238,7 +238,9 @@
             <cy id='cy3'></cy>
 
 
-
+                <h3>
+                    Meaning constructors:
+                </h3>
                 <editor>
                     <textarea class="rule" id="glueEditor" name="sentence"></textarea>
                 </editor>
@@ -269,9 +271,9 @@
                     </div>
 
                     <div>
-                        <label for="solutionOnly">
-                            <input type="checkbox" id="solutionOnly" name="solutionOnly">
-                            Solution Only
+                        <label for="explain">
+                            <input type="checkbox" id="explain" name="explain">
+                            Explanation
                         </label>
                     </div>
 
@@ -285,7 +287,10 @@
                     <input type="submit" value="Submit">
                 </form>
 
+                <h3> Semantics: </h3>
                 <sem id="sem5"></sem>
+                <h3>Log:</h3>
+                <log id="log1"></log>
             </div>
 
 
@@ -415,7 +420,7 @@
                 var prover = parseInt(document.getElementById("prover").value);
                 var outputstyle = parseInt(document.getElementById("outputstyle").value);
                 var parseSem = document.getElementById("parseSem").checked;
-                var solutionOnly = document.getElementById("solutionOnly").checked;
+                var explain = document.getElementById("explain").checked;
                 var debugging = document.getElementById("debugging").checked;
         //        var explainFail = document.getElementById("explainFail").checked;
 
@@ -426,7 +431,7 @@
                     "noreduce": false,
                     "glueOnly": false,
                     "meaningOnly": false,
-                    "solutionOnly": solutionOnly,
+                    "explainFail": explain,
                     "debugging": debugging
                 };
 
@@ -444,14 +449,14 @@
                     "gswbPreferences": gswbPreferencesJSON
                 }
 
-                gswbDeduce(JSON.stringify(GswbRequest), "sem5");
+                gswbDeduce(JSON.stringify(GswbRequest), "sem5", "log1");
             });
 
             // var page = "https://staging.liger.sperrle.dbvis.de"
             var ligerpage = "http://localhost:8080";
             var gswbpage = "http://localhost:8081"
 
-            function gswbDeduce(gswbRequest, semContainer)
+            function gswbDeduce(gswbRequest, semContainer, logContainer)
             {
                 $.ajax({
                     url: gswbpage + "/deduce",
@@ -467,9 +472,20 @@
 
                         //write each solution to html element with id semContainer as string per line
                         var semContainerElement = document.getElementById(semContainer);
-                        semContainerElement.innerHTML = "";
-                          for (var i = 0; i < data.length; i++) {
-                                semContainerElement.innerHTML += data[i] + "<br>";
+
+                        if (data.hasOwnProperty("solutions"))
+                        {
+                            semContainerElement.innerHTML = "";
+                            for (var i = 0; i < data["solutions"].length; i++) {
+                                semContainerElement.innerHTML += data["solutions"][i] + "<br>";
+                            }
+                        }
+
+                        if (data.hasOwnProperty("derivation"))
+                        {
+                            var logContainerElement = document.getElementById(logContainer);
+
+                            logContainerElement.innerText = data["derivation"];
                         }
 
                     },
