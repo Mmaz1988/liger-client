@@ -291,6 +291,11 @@
                 <sem id="sem5"></sem>
                 <h3>Log:</h3>
                 <log id="log1"></log>
+
+                <editor>
+                    <textarea class="rule" id="derivationEditor" name="derivation"></textarea>
+                </editor>
+
             </div>
 
 
@@ -484,6 +489,10 @@
                         if (data.hasOwnProperty("derivation"))
                         {
                             var logContainerElement = document.getElementById(logContainer);
+
+
+                              derivation_editor.getDoc().setValue(data["derivation"]);
+
 
                             logContainerElement.innerText = data["derivation"];
                         }
@@ -1175,6 +1184,10 @@
     });
 
     var glue_editor = CodeMirror.fromTextArea(document.getElementById("glueEditor"), {
+        mode: "glue"
+    });
+
+    var derivation_editor = CodeMirror.fromTextArea(document.getElementById("derivationEditor"), {
         mode: "glue"
     });
 
